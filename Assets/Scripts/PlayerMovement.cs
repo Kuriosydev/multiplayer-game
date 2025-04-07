@@ -3,28 +3,34 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerMovement : MonoBehaviourPunCallbacks
+public class PlayerMovement : MonoBehaviourPun, IPunObservable
 {
     public Transform _orientation;
-    [SerializeField] AudioClip _woodstep, _grassstep, _stonestep, _jumpSound;
+    //[SerializeField] AudioClip _woodstep, _grassstep, _stonestep, _jumpSound;
     FixedJoystick _joyStick;
-    public CinemachineOrbitalFollow _followCamera;
+    [SerializeField] CinemachineOrbitalFollow _followCamera;
+    [SerializeField] CinemachineThirdPersonFollow _fixedCamera;
     public AudioSource _audioSource;
     Animator _animator;
     [SerializeField] LayerMask _ground;
     Rigidbody _rb;
-    float _speed = 8f;
+    int _currentHealth, _maxHealth = 100;
+    float _speed = 8f, _rotationValue = 6f;
     Vector3 _inputDir;
     RaycastHit _hit;
     public AudioClip _footStepSound;
     bool _canJump = true;
+    bool _run = true;
+    bool _combatMode = false;
 
     private void Awake()
     {
+        _currentHealth = _maxHealth;
         _animator = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
-        _footStepSound = _stonestep;
+        //_footStepSound = _stonestep;
         _rb = GetComponent<Rigidbody>();
+        _rb.freezeRotation = false;
     }
 
     private void Start()
@@ -42,25 +48,88 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
             GroundCheck();
-            TouchControl();
+            if (_combatMode)
+            {             
+                TouchCliked();
+            }
+            else
+            {
+                TouchControl();
+            }
             JoyStickControl();
+        }
+    }
+
+    // function which turn on off camera for fighting and normal mode
+    public void CombatModeOnOff()
+    {
+        if (_followCamera.gameObject.activeSelf)
+        {
+            _followCamera.gameObject.SetActive(false);
+            _fixedCamera.gameObject.SetActive(true);
+            _combatMode = true;
+            _rotationValue = 5f;
+        }
+        else
+        {
+            _followCamera.gameObject.SetActive(true);
+            _fixedCamera.gameObject.SetActive(false);
+            _combatMode = false;
+            _rotationValue = 6f;
+        }
+    }
+
+    public void TouchCliked()
+    {
+        if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject())
+        {
+            foreach (Touch touch in Input.touches)
+            {
+                if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                {
+                    if (touch.phase == TouchPhase.Began)
+                    {
+                        _animator.SetBool("Melee",true);
+                    }
+                    else if (touch.phase == TouchPhase.Ended)
+                    {
+                        _animator.SetBool("Melee", false);
+                    }
+                }
+            }
+        }
+    }
+
+    public void RunAndWalkSwitch()
+    {
+        if (_run)
+        {
+            _run = false;
+            _speed = 5f;
+            _animator.SetBool("Run", false);
+        }
+        else
+        {
+            _run = true;
+            _speed = 8f;
+            _animator.SetBool("Walk", false);
         }
     }
 
     void GroundCheck()
     {
-        if (Physics.Raycast(_orientation.position, Vector3.down, out _hit, 0.2f))
+        if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
         {
             if (_canJump)
             {
-                if (_hit.collider.gameObject.layer == 7)
-                {
-                    if (_footStepSound != _woodstep)
-                    {
-                        _audioSource.Stop();
-                        _footStepSound = _woodstep;
-                    }
-                }
+                //if (_hit.collider.gameObject.layer == 7)
+                //{
+                //    if (_footStepSound != _woodstep)
+                //    {
+                //        _audioSource.Stop();
+                //        _footStepSound = _woodstep;
+                //    }
+                //}
             }
         }
     }
@@ -104,8 +173,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 _audioSource.PlayOneShot(_footStepSound);
             }
             _rb.AddForce(_inputDir.normalized * _speed * 400f * Time.deltaTime, ForceMode.Force);
-            transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, 6f * Time.deltaTime);
-            _animator.SetBool("Run", true);
+            transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
+            if (_run)
+            {
+                _animator.SetBool("Run", true);
+            }
+            else
+            {
+                _animator.SetBool("Walk", true);
+            }
         }
         else
         {
@@ -113,6 +189,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 _audioSource.Stop();
                 _animator.SetBool("Run", false);
+                _animator.SetBool("Walk", false);
             }
         }
     }
@@ -125,7 +202,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f, _ground))
             {
                 _audioSource.Stop();
-                _audioSource.PlayOneShot(_jumpSound);
+                //_audioSource.PlayOneShot(_jumpSound);
                 _rb.AddForce(Vector3.up * _speed * 25f * Time.deltaTime, ForceMode.Impulse);
                 _animator.SetBool("Jump", _canJump);
                 _canJump = false;
@@ -139,5 +216,25 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         _animator.SetBool("Jump", _canJump);
         _canJump = true;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (!photonView.IsMine) return;
+
+        _currentHealth -= damage;
+        _currentHealth = Mathf.Max(_currentHealth, 0);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(_currentHealth);
+        }
+        else
+        {
+            _currentHealth = (int)stream.ReceiveNext();
+        }
     }
 }
