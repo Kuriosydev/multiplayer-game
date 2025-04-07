@@ -1,21 +1,18 @@
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class MultiplayerLobby : MonoBehaviourPunCallbacks
 {
-    [SerializeField] GameObject _roomJoiningPanel, _waitingRoomPanel, _ConnectionPanel, _nameItemprefab, _roomItemprefab;
+    [SerializeField] GameObject _roomJoiningPanel, _waitingRoomPanel, _ConnectionPanel, _nameItemprefab, _customJoin, _directJoin;//, _roomItemprefab;
     [SerializeField] TMP_InputField _playerName, _roomName;
     [SerializeField] TMP_Text _roomNameAndCreater, _roomServerMessages;
-    [SerializeField] Transform _playerNameSpawnLocation, _roomNameSpawnLocation;
+    [SerializeField] Transform _playerNameSpawnLocation;//, _roomNameSpawnLocation;
     public bool _join = true, _create = true, _connected = false;
-    [SerializeField] Toggle _visiblehandler;
+    //[SerializeField] Toggle _visiblehandler;
 
     private void Start()
     {
@@ -71,23 +68,32 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnJoinRoomFailed(short returnCode, string message)
+    public void JoinOrCreateRandomRoom()
     {
-        base.OnJoinRoomFailed(returnCode, message);
-        _roomServerMessages.text = "Room doesn't exist...";
-        Invoke("Messagenull", 5f);
+        PhotonNetwork.JoinRandomOrCreateRoom();
+        PhotonNetwork.LoadLevel(1);
     }
 
-    public void RandomRoomJoin()
+    public void CreateRoom()
     {
-        PhotonNetwork.JoinRandomRoom();
-    }
-
-    public override void OnJoinRandomFailed(short returnCode, string message)
-    {
-        base.OnJoinRandomFailed(returnCode, message);
-        _roomServerMessages.text = "No Room Available...";
-        Invoke("Messagenull", 5f);
+        if (_roomName.text.Length > 2)
+        {
+            if (_create)
+            {
+                if (!PhotonNetwork.CreateRoom(_roomName.text, new RoomOptions() { IsVisible = false, MaxPlayers = 4 }))
+                {
+                    _create = true;
+                    Invoke("JoinReset", 0.5f);
+                    _roomServerMessages.text = "Room Code is already in use...";
+                    Invoke("Messagenull", 4f);
+                }
+            }
+        }
+        else
+        {
+            _roomServerMessages.text = "Room name Length should be more than 2...";
+            Invoke("Messagenull", 5f);
+        }
     }
 
     public override void OnJoinedRoom()
@@ -107,6 +113,20 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+        _roomServerMessages.text = "Room doesn't exist...";
+        Invoke("Messagenull", 5f);
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        base.OnJoinRandomFailed(returnCode, message);
+        _roomServerMessages.text = "No Room Available...";
+        Invoke("Messagenull", 5f);
+    }
+
     public override void OnLeftRoom()
     {
         base.OnLeftRoom();
@@ -114,28 +134,6 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         foreach (GameObject game in nameobj)
         {
             Destroy(game);
-        }
-    }
-
-    public void CreateRoom()
-    {
-        if (_roomName.text.Length > 2)
-        {
-            if (_create)
-            {
-                if (!PhotonNetwork.CreateRoom(_roomName.text, new RoomOptions() { IsVisible = _visiblehandler, MaxPlayers = 4 }))
-                {
-                    _create = true;
-                    Invoke("JoinReset", 0.5f);
-                    _roomServerMessages.text = "Room Code is already in use...";
-                    Invoke("Messagenull", 4f);
-                }
-            }
-        }
-        else
-        {
-            _roomServerMessages.text = "Room name Length should be more than 2...";
-            Invoke("Messagenull", 5f);
         }
     }
 
@@ -178,8 +176,6 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
             }
         }
     }
-
-
 
     public void StartClicked()
     {
@@ -232,20 +228,35 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    public void CustomJoinOnOff()
     {
-        base.OnRoomListUpdate(roomList);
-        foreach (GameObject room in GameObject.FindGameObjectsWithTag("Room"))
+        if (_customJoin.activeSelf)
         {
-            Destroy(room);
+            _customJoin.SetActive(false);
+            _directJoin.SetActive(true);
         }
-        foreach (RoomInfo room in roomList)
+        else
         {
-            GameObject NewRoom = Instantiate(_roomItemprefab, _roomNameSpawnLocation);
-            NewRoom.GetComponent<RoomClicked>()._roomName = room.Name;
-            NewRoom.GetComponent<RoomClicked>()._totalPlayers = room.PlayerCount.ToString() + "/" + room.MaxPlayers.ToString();
+            _customJoin.SetActive(true);
+            _directJoin.SetActive(false);
         }
     }
+
+    //Room availanle update code:-
+    //public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    //{
+    //    base.OnRoomListUpdate(roomList);
+    //    foreach (GameObject room in GameObject.FindGameObjectsWithTag("Room"))
+    //    {
+    //        Destroy(room);
+    //    }
+    //    foreach (RoomInfo room in roomList)
+    //    {
+    //        GameObject NewRoom = Instantiate(_roomItemprefab, _roomNameSpawnLocation);
+    //        NewRoom.GetComponent<RoomClicked>()._roomName = room.Name;
+    //        NewRoom.GetComponent<RoomClicked>()._totalPlayers = room.PlayerCount.ToString() + "/" + room.MaxPlayers.ToString();
+    //    }
+    //}
 
     void CanJoinReset()
     {
