@@ -28,11 +28,15 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         {
             if (!_connected)
             {
-                _ConnectionPanel.SetActive(false);
-                _roomJoiningPanel.SetActive(true);
                 if (!PhotonNetwork.InLobby && PhotonNetwork.CurrentLobby == null)
                 {
                     PhotonNetwork.JoinLobby();
+                }
+                if (PhotonNetwork.InLobby)
+                {
+                    _ConnectionPanel.SetActive(false);
+                    _roomJoiningPanel.SetActive(true);
+                    _connected = true;
                 }
             }
             try
@@ -70,8 +74,10 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void JoinOrCreateRandomRoom()
     {
-        PhotonNetwork.JoinRandomOrCreateRoom();
-        PhotonNetwork.LoadLevel(1);
+        if (PhotonNetwork.JoinRandomOrCreateRoom())
+        {
+            PhotonNetwork.LoadLevel(1);
+        }
     }
 
     public void CreateRoom()

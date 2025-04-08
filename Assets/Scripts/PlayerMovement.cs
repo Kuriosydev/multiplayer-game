@@ -2,10 +2,12 @@ using Photon.Pun;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviourPun, IPunObservable
 {
-    public Transform _orientation;
+    [SerializeField] Transform _orientation;
+    public Image _healthbar;
     //[SerializeField] AudioClip _woodstep, _grassstep, _stonestep, _jumpSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
@@ -14,14 +16,12 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
     Animator _animator;
     [SerializeField] LayerMask _ground;
     Rigidbody _rb;
-    int _currentHealth, _maxHealth = 100;
+    public int _currentHealth, _maxHealth = 100;
     float _speed = 8f, _rotationValue = 6f;
     Vector3 _inputDir;
     RaycastHit _hit;
     public AudioClip _footStepSound;
-    bool _canJump = true;
-    bool _run = true;
-    bool _combatMode = false;
+    bool _canJump = true, _run = true, _attack = false, _combatMode = false;
 
     private void Awake()
     {
@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         _audioSource = GetComponent<AudioSource>();
         //_footStepSound = _stonestep;
         _rb = GetComponent<Rigidbody>();
-        _rb.freezeRotation = false;
+        _rb.freezeRotation = true;
     }
 
     private void Start()
@@ -39,6 +39,7 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         if (photonView.IsMine)
         {
             _followCamera.gameObject.SetActive(true);
+            _healthbar.gameObject.SetActive(false);
         }
     }
 
@@ -46,6 +47,7 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine)
         {
+            _healthbar.fillAmount = _currentHealth / 100;
             _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
             GroundCheck();
             if (_combatMode)
@@ -57,25 +59,62 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
                 TouchControl();
             }
             JoyStickControl();
+            if(_currentHealth <= 0)
+            {
+                FindFirstObjectByType<UiManager>()._reSpawn = 1;
+                Destroy(gameObject, 0.2f);
+            }
+        }
+        else
+        {
+            HealthBarRotation(_healthbar.gameObject.transform);
         }
     }
 
     // function which turn on off camera for fighting and normal mode
     public void CombatModeOnOff()
     {
-        if (_followCamera.gameObject.activeSelf)
+        if (photonView.IsMine)
         {
-            _followCamera.gameObject.SetActive(false);
-            _fixedCamera.gameObject.SetActive(true);
-            _combatMode = true;
-            _rotationValue = 5f;
+            if (_followCamera.gameObject.activeSelf)
+            {
+                _followCamera.gameObject.SetActive(false);
+                _fixedCamera.gameObject.SetActive(true);
+                _combatMode = true;
+                _rotationValue = 5f;
+            }
+            else
+            {
+                _followCamera.gameObject.SetActive(true);
+                _fixedCamera.gameObject.SetActive(false);
+                _combatMode = false;
+                _rotationValue = 6f;
+            }
         }
-        else
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
         {
-            _followCamera.gameObject.SetActive(true);
-            _fixedCamera.gameObject.SetActive(false);
-            _combatMode = false;
-            _rotationValue = 6f;
+            if (_attack)
+            {
+                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(-20);
+                _attack = false;
+            }
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            if (_attack)
+            {
+                Debug.Log("called");
+                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(-20);
+                _attack = false;
+            }
         }
     }
 
@@ -89,10 +128,15 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
                 {
                     if (touch.phase == TouchPhase.Began)
                     {
+                        _attack = true;
                         _animator.SetBool("Melee",true);
+                    }else if (touch.phase == TouchPhase.Moved)
+                    {
+                        _attack = true;
                     }
                     else if (touch.phase == TouchPhase.Ended)
                     {
+                        _attack = false;
                         _animator.SetBool("Melee", false);
                     }
                 }
@@ -203,7 +247,7 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
             {
                 _audioSource.Stop();
                 //_audioSource.PlayOneShot(_jumpSound);
-                _rb.AddForce(Vector3.up * _speed * 25f * Time.deltaTime, ForceMode.Impulse);
+                _rb.AddForce(Vector3.up * _speed * 50f * Time.deltaTime, ForceMode.Impulse);
                 _animator.SetBool("Jump", _canJump);
                 _canJump = false;
                 Invoke("JumpReset", 0.8f);
@@ -218,12 +262,12 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         _canJump = true;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int _damage)
     {
         if (!photonView.IsMine) return;
 
-        _currentHealth -= damage;
-        _currentHealth = Mathf.Max(_currentHealth, 0);
+        _currentHealth -= _damage;
+        //_currentHealth = Mathf.Max(_currentHealth, 0);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -236,5 +280,12 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         {
             _currentHealth = (int)stream.ReceiveNext();
         }
+    }
+
+    void HealthBarRotation(Transform _bar)
+    {
+        Vector3 _dir = (transform.position - _bar.transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(_bar.transform.position.x, _dir.y, _dir.z));
+        _healthbar.transform.rotation = Quaternion.Slerp(_bar.transform.rotation, lookRotation, 8f * Time.deltaTime);
     }
 }

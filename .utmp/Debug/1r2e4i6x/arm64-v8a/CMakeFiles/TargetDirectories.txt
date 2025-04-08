@@ -1,0 +1,5 @@
+C:/Users/Administrator/Documents/GitHub/multiplayer-game/.utmp/Debug/1r2e4i6x/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Administrator/Documents/GitHub/multiplayer-game/.utmp/Debug/1r2e4i6x/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/Administrator/Documents/GitHub/multiplayer-game/.utmp/Debug/1r2e4i6x/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Users/Administrator/Documents/GitHub/multiplayer-game/.utmp/Debug/1r2e4i6x/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Users/Administrator/Documents/GitHub/multiplayer-game/.utmp/Debug/1r2e4i6x/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
