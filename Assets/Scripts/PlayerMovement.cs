@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     float _speed = 8f, _rotationValue = 6f;
     Vector3 _inputDir;
     RaycastHit _hit;
-    bool _canJump = true, _run = true, _attack = false, _combatMode = false;
+    bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true;
 
     private void Awake()
     {
@@ -43,17 +43,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void Update()
     {
+        _healthbar.fillAmount = _currentHealth / 100f;
         if (photonView.IsMine)
-        {
-            _healthbar.fillAmount = _currentHealth / 100;
-            _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
+        { 
             GroundCheck();
             if (_combatMode)
-            {             
+            {
+                _orientation.forward = transform.position - new Vector3(_fixedCamera.transform.position.x, transform.position.y, _fixedCamera.transform.position.z);
                 TouchCliked();
             }
             else
             {
+                _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
                 TouchControl();
             }
             JoyStickControl();
@@ -115,13 +116,22 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 {
                     if (touch.phase == TouchPhase.Began)
                     {
-                        _attack = true;
-                        _animator.SetBool("Melee",true);
-                        _audioSource.Stop();
-                        _audioSource.PlayOneShot(_punchSound);
+                        if (_canHit)
+                        {
+                            _attack = true;
+                            _canHit = false;
+                            _animator.SetBool("Melee", true);
+                            _audioSource.Stop();
+                            _audioSource.PlayOneShot(_punchSound);
+                            Invoke("CanHit", 0.5f);
+                        }
                     }else if (touch.phase == TouchPhase.Moved)
                     {
-                        _attack = true;
+                        if (_canHit)
+                        {
+                            _attack = true;
+                            Invoke("CanHit", 0.5f);
+                        }
                     }
                     else if (touch.phase == TouchPhase.Ended)
                     {
@@ -131,6 +141,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 }
             }
         }
+    }
+
+    void CanHit()
+    {
+        _canHit = true;
     }
 
     public void RunAndWalkSwitch()
