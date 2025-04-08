@@ -11,7 +11,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     [SerializeField] TMP_InputField _playerName, _roomName;
     [SerializeField] TMP_Text _roomNameAndCreater, _roomServerMessages;
     [SerializeField] Transform _playerNameSpawnLocation;//, _roomNameSpawnLocation;
-    public bool _join = true, _create = true, _connected = false;
+    public bool _join = true, _create = true, _connected = false, _randomJoinCreate = false;
     //[SerializeField] Toggle _visiblehandler;
 
     private void Start()
@@ -76,7 +76,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.JoinRandomOrCreateRoom())
         {
-            PhotonNetwork.LoadLevel(1);
+            _randomJoinCreate = true;
         }
     }
 
@@ -106,16 +106,23 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     {
         base.OnJoinedRoom();
         _connected = true;
-        PhotonNetwork.KeepAliveInBackground = 300;
-        _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
-        _roomJoiningPanel.SetActive(false);
-        _waitingRoomPanel.SetActive(true);
-        Dictionary<int, Player> i = PhotonNetwork.CurrentRoom.Players;
-        foreach (Player player in i.Values)
+        if (_randomJoinCreate)
         {
-            GameObject text = Instantiate(_nameItemprefab, _playerNameSpawnLocation);
-            text.name = player.UserId;
-            text.GetComponent<TMP_Text>().text = player.NickName;
+            PhotonNetwork.LoadLevel(1);
+        }
+        else
+        {
+            PhotonNetwork.KeepAliveInBackground = 300;
+            _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
+            _roomJoiningPanel.SetActive(false);
+            _waitingRoomPanel.SetActive(true);
+            Dictionary<int, Player> i = PhotonNetwork.CurrentRoom.Players;
+            foreach (Player player in i.Values)
+            {
+                GameObject text = Instantiate(_nameItemprefab, _playerNameSpawnLocation);
+                text.name = player.UserId;
+                text.GetComponent<TMP_Text>().text = player.NickName;
+            }
         }
     }
 
@@ -146,11 +153,18 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         base.OnCreatedRoom();
-        _connected = true;
-        _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
-        _create = false;
-        _roomJoiningPanel.SetActive(false);
-        _waitingRoomPanel.SetActive(true);
+        if (_randomJoinCreate)
+        {
+            PhotonNetwork.LoadLevel(1);
+        }
+        else
+        {
+            _connected = true;
+            _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
+            _create = false;
+            _roomJoiningPanel.SetActive(false);
+            _waitingRoomPanel.SetActive(true);
+        }
     }
 
     public void MainMenu()

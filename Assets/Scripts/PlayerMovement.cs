@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class PlayerMovement : MonoBehaviourPun, IPunObservable
+public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     [SerializeField] Transform _orientation;
     public Image _healthbar;
-    //[SerializeField] AudioClip _woodstep, _grassstep, _stonestep, _jumpSound;
+    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _runSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
     [SerializeField] CinemachineThirdPersonFollow _fixedCamera;
@@ -20,7 +20,6 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
     float _speed = 8f, _rotationValue = 6f;
     Vector3 _inputDir;
     RaycastHit _hit;
-    public AudioClip _footStepSound;
     bool _canJump = true, _run = true, _attack = false, _combatMode = false;
 
     private void Awake()
@@ -28,7 +27,6 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         _currentHealth = _maxHealth;
         _animator = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
-        //_footStepSound = _stonestep;
         _rb = GetComponent<Rigidbody>();
         _rb.freezeRotation = true;
     }
@@ -62,7 +60,7 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
             if(_currentHealth <= 0)
             {
                 FindFirstObjectByType<UiManager>()._reSpawn = 1;
-                Destroy(gameObject, 0.2f);
+                PhotonNetwork.Destroy(gameObject);
             }
         }
         else
@@ -93,18 +91,6 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Player"))
-        {
-            if (_attack)
-            {
-                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(-20);
-                _attack = false;
-            }
-        }
-    }
-
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
@@ -112,7 +98,8 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
             if (_attack)
             {
                 Debug.Log("called");
-                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(-20);
+                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(20);
+                Debug.Log(other.gameObject.GetComponent<PlayerMovement>()._currentHealth);
                 _attack = false;
             }
         }
@@ -130,6 +117,8 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
                     {
                         _attack = true;
                         _animator.SetBool("Melee",true);
+                        _audioSource.Stop();
+                        _audioSource.PlayOneShot(_punchSound);
                     }else if (touch.phase == TouchPhase.Moved)
                     {
                         _attack = true;
@@ -212,19 +201,23 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         _inputDir = _orientation.forward * _joyStick.Vertical + _orientation.right * _joyStick.Horizontal;
         if (_inputDir.magnitude != 0)
         {
-            if (!_audioSource.isPlaying)
-            {
-                _audioSource.PlayOneShot(_footStepSound);
-            }
             _rb.AddForce(_inputDir.normalized * _speed * 400f * Time.deltaTime, ForceMode.Force);
             transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
             if (_run)
             {
                 _animator.SetBool("Run", true);
+                if (!_audioSource.isPlaying)
+                {
+                    _audioSource.PlayOneShot(_runSound);
+                }
             }
             else
             {
                 _animator.SetBool("Walk", true);
+                if (!_audioSource.isPlaying)
+                {
+                    _audioSource.PlayOneShot(_walkSound);
+                }
             }
         }
         else
@@ -238,7 +231,6 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         }
     }
 
-
     public void Jump()
     {
         if (_canJump)
@@ -246,7 +238,7 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
             if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f, _ground))
             {
                 _audioSource.Stop();
-                //_audioSource.PlayOneShot(_jumpSound);
+                _audioSource.PlayOneShot(_jumpSound);
                 _rb.AddForce(Vector3.up * _speed * 50f * Time.deltaTime, ForceMode.Impulse);
                 _animator.SetBool("Jump", _canJump);
                 _canJump = false;
@@ -255,31 +247,22 @@ public class PlayerMovement : MonoBehaviourPun, IPunObservable
         }
     }
 
-
     public void JumpReset()
     {
         _animator.SetBool("Jump", _canJump);
         _canJump = true;
     }
 
-    public void TakeDamage(int _damage)
+    public void TakeDamage(int damage)
     {
-        if (!photonView.IsMine) return;
-
-        _currentHealth -= _damage;
-        //_currentHealth = Mathf.Max(_currentHealth, 0);
+        _currentHealth -= damage;
+        photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
     }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    
+    [PunRPC]
+    void UpdateHealth(int newHealth)
     {
-        if (stream.IsWriting)
-        {
-            stream.SendNext(_currentHealth);
-        }
-        else
-        {
-            _currentHealth = (int)stream.ReceiveNext();
-        }
+        _currentHealth = newHealth;
     }
 
     void HealthBarRotation(Transform _bar)

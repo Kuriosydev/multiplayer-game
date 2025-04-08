@@ -1241,6 +1241,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _orientation: {fileID: 1935640170571965700}
   _healthbar: {fileID: 7978578912085852653}
+  _punchSound: {fileID: 8300000, guid: 9282e6c0ce86e584c95641c89b225ce3, type: 3}
+  _walkSound: {fileID: 8300000, guid: 6ab0ff331e839394185d87c61d8489a4, type: 3}
+  _jumpSound: {fileID: 8300000, guid: 72ff16121d595e54d99c004614c41456, type: 3}
+  _runSound: {fileID: 8300000, guid: dc06ade4eb399a443974de2b13d762fa, type: 3}
   _followCamera: {fileID: 5173827973441876522}
   _fixedCamera: {fileID: 4248077755381259518}
   _audioSource: {fileID: 3767964995761660724}
@@ -1249,7 +1253,6 @@ MonoBehaviour:
     m_Bits: 4294967295
   _currentHealth: 0
   _maxHealth: 100
-  _footStepSound: {fileID: 0}
 --- !u!95 &6948772372263774650
 Animator:
   serializedVersion: 7
@@ -1341,7 +1344,6 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 7647326871225934664}
   - {fileID: 8294244214806660011}
   - {fileID: 7718204908346073925}
   sceneViewId: 0
@@ -1435,7 +1437,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.3
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
   Mute: 0
