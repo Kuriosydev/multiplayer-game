@@ -99,7 +99,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             if (_attack)
             {
                 Debug.Log("called");
-                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(20);
+                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(10);
                 Debug.Log(other.gameObject.GetComponent<PlayerMovement>()._currentHealth);
                 _attack = false;
             }
@@ -123,14 +123,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                             _animator.SetBool("Melee", true);
                             _audioSource.Stop();
                             _audioSource.PlayOneShot(_punchSound);
-                            Invoke("CanHit", 0.5f);
+                            Invoke("CanHit", 1f);
                         }
                     }else if (touch.phase == TouchPhase.Moved)
                     {
                         if (_canHit)
                         {
                             _attack = true;
-                            Invoke("CanHit", 0.5f);
+                            Invoke("CanHit", 1f);
                         }
                     }
                     else if (touch.phase == TouchPhase.Ended)
