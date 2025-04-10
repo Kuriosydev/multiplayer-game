@@ -403,6 +403,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _soundPlaying = false;
         photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
         _dashEffect.SetActive(false);
+        _animator.SetBool("DashForward", false);
     }
 
     void DeathAnimation()
