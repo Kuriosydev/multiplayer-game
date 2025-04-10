@@ -43,6 +43,11 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - UpdateHealth
+  - SateUpdate
+  - HitCountUpdate
+  - ObjectTurnOn
+  - RPC_StopParticle
+  - ObjectTurnOff
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

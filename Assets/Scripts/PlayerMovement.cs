@@ -31,6 +31,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _audioSource = GetComponent<AudioSource>();
         _rb = GetComponent<Rigidbody>();
         _rb.freezeRotation = true;
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
     }
 
     private void Start()
@@ -108,10 +113,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             _state = 0;
-            _leftHand.SetActive(false);
-            _rightHand.SetActive(false);
-            _knife1.SetActive(false);
-            _knife2.SetActive(false);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike", false);
             _hitCounter = 0;
             _followCamera.gameObject.SetActive(true);
@@ -126,10 +131,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             _state = 1;
-            _leftHand.SetActive(true);
-            _rightHand.SetActive(true);
-            _knife1.SetActive(false);
-            _knife2.SetActive(false);
+            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike",true);
             _hitCounter = 0;
             _followCamera.gameObject.SetActive(false);
@@ -144,10 +149,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             _state = 2;
-            _leftHand.SetActive(false);
-            _rightHand.SetActive(false);
-            _knife1.SetActive(true);
-            _knife2.SetActive(true);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike", true);
             _hitCounter = 0;
             _followCamera.gameObject.SetActive(false);
@@ -170,7 +175,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 Debug.Log("called");
                 other.gameObject.GetComponent<PlayerMovement>().TakeDamage(10);
-                Debug.Log(other.gameObject.GetComponent<PlayerMovement>()._currentHealth);
                 _attack = false;
             }
         }
@@ -315,7 +319,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _audioSource.Stop();
         _audioSource.PlayOneShot(_dashSound);
         _animator.SetBool("DashForward", true);
-        _dashEffect.SetActive(true);
+        photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
         _rb.AddForce(transform.forward * _speed * 500f * Time.deltaTime, ForceMode.Impulse);
     }
 
@@ -397,7 +401,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public void DashForwardReset()
     {
         _soundPlaying = false;
-        _animator.SetBool("DashForward", false);
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
         _dashEffect.SetActive(false);
     }
 
@@ -407,4 +411,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _dashEffect.SetActive(false);
     }
 
+
+    [PunRPC]
+    void ObjectTurnOn(int viewId)
+    {
+        PhotonView _pv = PhotonView.Find(viewId);
+        _pv.gameObject.SetActive(true);
+    }
+
+    [PunRPC]
+    void ObjectTurnOff(int viewId)
+    {
+        PhotonView _pv = PhotonView.Find(viewId);
+        _pv.gameObject.SetActive(false);
+    }
 }
