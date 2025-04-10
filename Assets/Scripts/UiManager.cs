@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class UiManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] Button _jump, _combatMode, _walkRun, _mic;
+    [SerializeField] Button _jump, _dash, _mic, _normalMode, _meleeMode, _swordMode;
     [SerializeField] GameObject _player;
     PlayerMovement _localPlayer;
     public int _reSpawn = 1;
@@ -18,8 +18,10 @@ public class UiManager : MonoBehaviourPunCallbacks
     {
         _slider.onValueChanged.AddListener(SliderValueChanged);
         _jump.onClick.AddListener(JumpClicked);
-        _combatMode.onClick.AddListener(CombatMode);
-        _walkRun.onClick.AddListener(WalkRunSwitch);
+        _normalMode.onClick.AddListener(NormalMode);
+        _meleeMode.onClick.AddListener(MeleeMode);
+        _swordMode.onClick.AddListener(SwordMode);
+        _dash.onClick.AddListener(Dash);
         _mic.onClick.AddListener(MicOnOff);
     }
 
@@ -40,14 +42,24 @@ public class UiManager : MonoBehaviourPunCallbacks
         }
     }
 
-    void WalkRunSwitch()
+    void Dash()
     {
-        _localPlayer.RunAndWalkSwitch();
+        _localPlayer.DashForward();
     }
 
-    void CombatMode()
+    void NormalMode()
     {
-        _localPlayer.CombatModeOnOff();
+        _localPlayer.NormalsMode();
+    }
+
+    void MeleeMode()
+    {
+        _localPlayer.MeleeMode();
+    }
+
+    void SwordMode()
+    {
+        _localPlayer.SwordMode();
     }
 
     void JumpClicked()

@@ -7,8 +7,9 @@ using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     [SerializeField] Transform _orientation;
+    [SerializeField] GameObject _leftHand , _rightHand, _dashEffect, _knife1, _knife2;
     public Image _healthbar;
-    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _runSound;
+    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
     [SerializeField] CinemachineThirdPersonFollow _fixedCamera;
@@ -16,11 +17,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     Animator _animator;
     [SerializeField] LayerMask _ground;
     Rigidbody _rb;
-    public int _currentHealth, _maxHealth = 100;
-    float _speed = 8f, _rotationValue = 6f;
+    public int _currentHealth, _maxHealth = 100, _jumpForce = 200, _dashForce = 500;
+    float _speed = 15f, _rotationValue = 6f, _turnOffStrike = 1f;
     Vector3 _inputDir;
     RaycastHit _hit;
-    bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true;
+    int _state = 0, _hitCounter = 0, _jumpCount = 0;
+    bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying =false;
 
     private void Awake()
     {
@@ -45,24 +47,27 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         _healthbar.fillAmount = _currentHealth / 100f;
         if (photonView.IsMine)
-        { 
-            GroundCheck();
-            if (_combatMode)
+        {
+            //GroundCheck();
+            if (_currentHealth > 0)
             {
-                _orientation.forward = transform.position - new Vector3(_fixedCamera.transform.position.x, transform.position.y, _fixedCamera.transform.position.z);
-                TouchCliked();
+                if (_combatMode)
+                {
+                    _orientation.forward = transform.position - new Vector3(_fixedCamera.transform.position.x, transform.position.y, _fixedCamera.transform.position.z);
+                    TouchCliked();
+                }
+                else
+                {
+                    _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
+                    TouchControl();
+                }
+                JoyStickControl();
             }
             else
             {
-                _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
-                TouchControl();
+                _animator.SetBool("Death", true);
             }
-            JoyStickControl();
-            if(_currentHealth <= 0)
-            {
-                FindFirstObjectByType<UiManager>()._reSpawn = 1;
-                PhotonNetwork.Destroy(gameObject);
-            }
+            
         }
         else
         {
@@ -71,25 +76,90 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     }
 
     // function which turn on off camera for fighting and normal mode
-    public void CombatModeOnOff()
+    //public void CombatModeOnOff()
+    //{
+    //    if (photonView.IsMine)
+    //    {
+    //        if (_followCamera.gameObject.activeSelf)
+    //        {
+    //            _followCamera.gameObject.SetActive(false);
+    //            _fixedCamera.gameObject.SetActive(true);
+    //            _combatMode = true;
+    //            _rotationValue = 5f;
+    //        }
+    //        else
+    //        {
+    //            _followCamera.gameObject.SetActive(true);
+    //            _fixedCamera.gameObject.SetActive(false);
+    //            _combatMode = false;
+    //            _rotationValue = 6f;
+    //        }
+    //    }
+    //}
+
+    public void AfterDeath()
+    {
+        FindFirstObjectByType<UiManager>()._reSpawn = 1;
+        PhotonNetwork.Destroy(gameObject);
+    }
+
+    public void NormalsMode()
     {
         if (photonView.IsMine)
         {
-            if (_followCamera.gameObject.activeSelf)
-            {
-                _followCamera.gameObject.SetActive(false);
-                _fixedCamera.gameObject.SetActive(true);
-                _combatMode = true;
-                _rotationValue = 5f;
-            }
-            else
-            {
-                _followCamera.gameObject.SetActive(true);
-                _fixedCamera.gameObject.SetActive(false);
-                _combatMode = false;
-                _rotationValue = 6f;
-            }
+            _state = 0;
+            _leftHand.SetActive(false);
+            _rightHand.SetActive(false);
+            _knife1.SetActive(false);
+            _knife2.SetActive(false);
+            _animator.SetBool("Strike", false);
+            _hitCounter = 0;
+            _followCamera.gameObject.SetActive(true);
+            _fixedCamera.gameObject.SetActive(false);
+            _combatMode = false;
+            _rotationValue = 6f;
         }
+    }
+
+    public void MeleeMode()
+    {
+        if (photonView.IsMine)
+        {
+            _state = 1;
+            _leftHand.SetActive(true);
+            _rightHand.SetActive(true);
+            _knife1.SetActive(false);
+            _knife2.SetActive(false);
+            _animator.SetBool("Strike",true);
+            _hitCounter = 0;
+            _followCamera.gameObject.SetActive(false);
+            _fixedCamera.gameObject.SetActive(true);
+            _combatMode = true;
+            _rotationValue = 5f;
+        }
+    }
+
+    public void SwordMode()
+    {
+        if (photonView.IsMine)
+        {
+            _state = 2;
+            _leftHand.SetActive(false);
+            _rightHand.SetActive(false);
+            _knife1.SetActive(true);
+            _knife2.SetActive(true);
+            _animator.SetBool("Strike", true);
+            _hitCounter = 0;
+            _followCamera.gameObject.SetActive(false);
+            _fixedCamera.gameObject.SetActive(true);
+            _combatMode = true;
+            _rotationValue = 5f;
+        }
+    }
+
+    void StrikeCounterUp(int value)
+    {
+        _animator.SetInteger("StrikeNumber", value);
     }
 
     private void OnTriggerStay(Collider other)
@@ -108,7 +178,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void TouchCliked()
     {
-        if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject())
+        if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject() && _currentHealth > 0)
         {
             foreach (Touch touch in Input.touches)
             {
@@ -120,31 +190,40 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                         {
                             _attack = true;
                             _canHit = false;
-                            _animator.SetBool("Melee", true);
+                            StrikeCounterUp(_hitCounter);
+                            _soundPlaying = true;
                             _audioSource.Stop();
-                            _audioSource.PlayOneShot(_punchSound);
-                            Invoke("CanHit", 1f);
-                        }
-                    }else if (touch.phase == TouchPhase.Moved)
-                    {
-                        if (_canHit)
-                        {
-                            _attack = true;
-                            Invoke("CanHit", 1f);
+                            if (_state == 1)
+                            {
+                                _animator.SetBool("Melee",true);
+                                _audioSource.PlayOneShot(_punchSound);
+                            }
+                            else if (_state == 2)
+                            {
+                                _animator.SetBool("Sword", true);
+                                _audioSource.PlayOneShot(_swordSound);
+                            }
                         }
                     }
                     else if (touch.phase == TouchPhase.Ended)
                     {
                         _attack = false;
-                        _animator.SetBool("Melee", false);
                     }
                 }
             }
         }
     }
 
-    void CanHit()
+    public void AttackDone()
     {
+        _hitCounter += 1;
+        if (_hitCounter >= 4)
+        {
+            _hitCounter = 0;
+        }
+        _soundPlaying = false;
+        _animator.SetBool("Melee", false);
+        _animator.SetBool("Sword", false);
         _canHit = true;
     }
 
@@ -153,32 +232,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (_run)
         {
             _run = false;
-            _speed = 5f;
+            _speed = 12f;
             _animator.SetBool("Run", false);
         }
         else
         {
             _run = true;
-            _speed = 8f;
+            _speed = 15f;
             _animator.SetBool("Walk", false);
-        }
-    }
-
-    void GroundCheck()
-    {
-        if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
-        {
-            if (_canJump)
-            {
-                //if (_hit.collider.gameObject.layer == 7)
-                //{
-                //    if (_footStepSound != _woodstep)
-                //    {
-                //        _audioSource.Stop();
-                //        _footStepSound = _woodstep;
-                //    }
-                //}
-            }
         }
     }
 
@@ -213,65 +274,111 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void JoyStickControl()
     {
-        _inputDir = _orientation.forward * _joyStick.Vertical + _orientation.right * _joyStick.Horizontal;
-        if (_inputDir.magnitude != 0)
-        {
-            _rb.AddForce(_inputDir.normalized * _speed * 400f * Time.deltaTime, ForceMode.Force);
-            transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
-            if (_run)
+        if (_currentHealth > 0) {
+            _inputDir = _orientation.forward * _joyStick.Vertical + _orientation.right * _joyStick.Horizontal;
+            if (_inputDir.magnitude != 0)
             {
-                _animator.SetBool("Run", true);
-                if (!_audioSource.isPlaying)
+                _rb.AddForce(_inputDir.normalized * _speed * 400f * Time.deltaTime, ForceMode.Force);
+                transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
+                if (_run)
                 {
-                    _audioSource.PlayOneShot(_runSound);
+                    _animator.SetBool("Run", true);
+                    if (!_audioSource.isPlaying)
+                    {
+                        _audioSource.PlayOneShot(_runSound);
+                    }
+                }
+                else
+                {
+                    _animator.SetBool("Walk", true);
+                    if (!_audioSource.isPlaying)
+                    {
+                        _audioSource.PlayOneShot(_walkSound);
+                    }
                 }
             }
             else
             {
-                _animator.SetBool("Walk", true);
-                if (!_audioSource.isPlaying)
+                if(_jumpCount == 0 && !_soundPlaying)
                 {
-                    _audioSource.PlayOneShot(_walkSound);
+                    _audioSource.Stop();
                 }
-            }
-        }
-        else
-        {
-            if (_canJump)
-            {
-                _audioSource.Stop();
                 _animator.SetBool("Run", false);
                 _animator.SetBool("Walk", false);
             }
         }
     }
 
+    public void DashForward()
+    {
+        _soundPlaying = true;
+        _audioSource.Stop();
+        _audioSource.PlayOneShot(_dashSound);
+        _animator.SetBool("DashForward", true);
+        _dashEffect.SetActive(true);
+        _rb.AddForce(transform.forward * _speed * 500f * Time.deltaTime, ForceMode.Impulse);
+    }
+
+    public void GroundCheck()
+    {
+        if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
+        {
+            JumpReset();
+            _canJump = true;
+            _animator.SetBool("JumpCheck", false);
+        }
+        else
+        {
+            _animator.SetBool("JumpCheck", false);
+        }
+    }
+
     public void Jump()
     {
-        if (_canJump)
+        if (_currentHealth > 0)
         {
             if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f, _ground))
             {
+                _animator.SetBool("JumpCheck", true);
+                _soundPlaying = true;
                 _audioSource.Stop();
                 _audioSource.PlayOneShot(_jumpSound);
-                _rb.AddForce(Vector3.up * _speed * 50f * Time.deltaTime, ForceMode.Impulse);
-                _animator.SetBool("Jump", _canJump);
+                _jumpCount = 1;
+                _animator.SetInteger("Jump", _jumpCount);
+                _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
                 _canJump = false;
-                Invoke("JumpReset", 0.8f);
+            }
+            else if (_jumpCount == 1)
+            {
+                _soundPlaying = true;
+                _audioSource.Stop();
+                _audioSource.PlayOneShot(_doubleJumpSound);
+                _jumpCount = 2;
+                _animator.SetInteger("Jump", _jumpCount);
+                _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
+            }
+            else
+            {
+                _jumpCount = 0;
             }
         }
     }
 
     public void JumpReset()
     {
-        _animator.SetBool("Jump", _canJump);
-        _canJump = true;
+        _soundPlaying = false;
+        _jumpCount = 0;
+        _animator.SetBool("JumpCheck", false);
+        _animator.SetInteger("Jump", 0);
     }
 
     public void TakeDamage(int damage)
     {
-        _currentHealth -= damage;
-        photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
+        if (_currentHealth > 0)
+        {
+            _currentHealth -= damage;
+            photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
+        }
     }
     
     [PunRPC]
@@ -286,4 +393,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(_bar.transform.position.x, _dir.y, _dir.z));
         _healthbar.transform.rotation = Quaternion.Slerp(_bar.transform.rotation, lookRotation, 8f * Time.deltaTime);
     }
+
+    public void DashForwardReset()
+    {
+        _soundPlaying = false;
+        _animator.SetBool("DashForward", false);
+        _dashEffect.SetActive(false);
+    }
+
+    void DeathAnimation()
+    {
+        _animator.SetBool("Death", true);
+        _dashEffect.SetActive(false);
+    }
+
 }

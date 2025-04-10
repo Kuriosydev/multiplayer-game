@@ -1240,11 +1240,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _orientation: {fileID: 1935640170571965700}
+  _leftHand: {fileID: 0}
+  _rightHand: {fileID: 0}
+  _dashEffect: {fileID: 0}
+  _knife1: {fileID: 0}
+  _knife2: {fileID: 0}
   _healthbar: {fileID: 7978578912085852653}
   _punchSound: {fileID: 8300000, guid: 9282e6c0ce86e584c95641c89b225ce3, type: 3}
   _walkSound: {fileID: 8300000, guid: 6ab0ff331e839394185d87c61d8489a4, type: 3}
   _jumpSound: {fileID: 8300000, guid: 72ff16121d595e54d99c004614c41456, type: 3}
+  _doubleJumpSound: {fileID: 0}
   _runSound: {fileID: 8300000, guid: dc06ade4eb399a443974de2b13d762fa, type: 3}
+  _swordSound: {fileID: 0}
+  _dashSound: {fileID: 0}
   _followCamera: {fileID: 5173827973441876522}
   _fixedCamera: {fileID: 4248077755381259518}
   _audioSource: {fileID: 3767964995761660724}
@@ -1253,6 +1261,8 @@ MonoBehaviour:
     m_Bits: 4294967295
   _currentHealth: 0
   _maxHealth: 100
+  _jumpForce: 200
+  _dashForce: 500
 --- !u!95 &6948772372263774650
 Animator:
   serializedVersion: 7
