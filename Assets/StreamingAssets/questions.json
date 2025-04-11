@@ -1,0 +1,104 @@
+{
+  "questions": [
+    {
+            "questionText": "What is 45 + 28?",
+            "options": [
+                "63",
+                "73",
+                "75",
+                "85"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "What is 58 - 32?",
+            "options": [
+                "25",
+                "26",
+                "27",
+                "28"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "What is the sum of 123 and 87?",
+            "options": [
+                "210",
+                "220",
+                "212",
+                "220"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "What is 71 - 56?",
+            "options": [
+                "15",
+                "14",
+                "13",
+                "12"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "What is the value of the digit 6 in the number 562?",
+            "options": [
+                "6",
+                "60",
+                "600",
+                "6000"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "Which number has 3 tens and 5 ones?",
+            "options": [
+                "53",
+                "35",
+                "305",
+                "503"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "What is the number represented by 4 hundreds, 5 tens, and 7 ones?",
+            "options": [
+                "457",
+                "547",
+                "475",
+                "4570"
+            ],
+            "correctAnswerIndex": 0
+        },
+        {
+            "questionText": "What is the next number in this pattern? 10, 20, 30, 40, ___?",
+            "options": [
+                "50",
+                "45",
+                "35",
+                "60"
+            ],
+            "correctAnswerIndex": 0
+        },
+        {
+            "questionText": "What is the next number in the pattern? 5, 10, 15, 20, ___?",
+            "options": [
+                "25",
+                "30",
+                "35",
+                "40"
+            ],
+            "correctAnswerIndex": 1
+        },
+        {
+            "questionText": "What comes next in this skip-counting pattern? 3, 6, 9, 12, ___?",
+            "options": [
+                "14",
+                "15",
+                "18",
+                "20"
+            ],
+            "correctAnswerIndex": 2
+        }
+  ]
+}

@@ -1216,6 +1216,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dfdc652450496c54c9a49091af9518ed, type: 3}
       insertIndex: -1
       addedObject: {fileID: 977410803519737167}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dfdc652450496c54c9a49091af9518ed, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -318754825041963464}
   m_SourcePrefab: {fileID: 100100000, guid: dfdc652450496c54c9a49091af9518ed, type: 3}
 --- !u!4 &8111427051124377176 stripped
 Transform:
@@ -1263,6 +1266,7 @@ MonoBehaviour:
   _maxHealth: 100
   _jumpForce: 200
   _dashForce: 500
+  _walkSpeed: 0
 --- !u!95 &6948772372263774650
 Animator:
   serializedVersion: 7
@@ -1419,6 +1423,30 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: Melee
+  - Type: 4
+    SynchronizeType: 0
+    Name: GotHit
+  - Type: 4
+    SynchronizeType: 0
+    Name: Swim
+  - Type: 4
+    SynchronizeType: 0
+    Name: DashForward
+  - Type: 4
+    SynchronizeType: 0
+    Name: Strike
+  - Type: 4
+    SynchronizeType: 0
+    Name: Sword
+  - Type: 3
+    SynchronizeType: 0
+    Name: StrikeNumber
+  - Type: 4
+    SynchronizeType: 0
+    Name: Death
+  - Type: 4
+    SynchronizeType: 0
+    Name: JumpCheck
   m_SynchronizeLayers:
   - SynchronizeType: 1
     LayerIndex: 0
@@ -1552,3 +1580,17 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.2
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &-318754825041963464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8924519561688194274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b14f0ceb2f8552f4c8414cac28218836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rayDistance: 5
+  _quizPanel: {fileID: 946826381382596423, guid: 8066172c481f6014b9975f1a715fd29b, type: 3}

@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     Rigidbody _rb;
     public int _currentHealth, _maxHealth = 100, _jumpForce = 200, _dashForce = 500;
     float _speed = 15f, _rotationValue = 6f, _turnOffStrike = 1f;
+    public float _walkSpeed;
     Vector3 _inputDir;
     RaycastHit _hit;
     int _state = 0, _hitCounter = 0, _jumpCount = 0;
@@ -282,7 +283,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _inputDir = _orientation.forward * _joyStick.Vertical + _orientation.right * _joyStick.Horizontal;
             if (_inputDir.magnitude != 0)
             {
-                _rb.AddForce(_inputDir.normalized * _speed * 400f * Time.deltaTime, ForceMode.Force);
+                _rb.AddForce(_inputDir.normalized * _speed * _walkSpeed * Time.deltaTime, ForceMode.Force);
                 transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
                 if (_run)
                 {
@@ -320,7 +321,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _audioSource.PlayOneShot(_dashSound);
         _animator.SetBool("DashForward", true);
         photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
-        _rb.AddForce(transform.forward * _speed * 500f * Time.deltaTime, ForceMode.Impulse);
+        _rb.AddForce(transform.forward * _speed * _dashForce * Time.deltaTime, ForceMode.Impulse);
     }
 
     public void GroundCheck()

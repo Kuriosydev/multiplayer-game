@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Name
   - Speaker
+  - Chest
+  - Quiz
   layers:
   - Default
   - TransparentFX

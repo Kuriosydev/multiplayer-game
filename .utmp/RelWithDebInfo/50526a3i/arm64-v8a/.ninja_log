@@ -1,0 +1,19 @@
+# ninja log v5
+65	3433	7659255236180658	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	349d146689e64600
+117	3666	7659255238922020	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e17239440d9e6cdf
+1	3534	7659255236841792	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	dcb245e36c18aa5c
+44	3543	7659255236663158	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	9302cf86cd22ec01
+22	3612	7659255238208742	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c4f5000dcd3eadbb
+77	3548	7659255237303159	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	927cc904902bf7a0
+32	4007	7659255242405424	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	7a8b65f0f20232c1
+11	4225	7659255244381681	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	5e8d37481e0f1d27
+4225	4402	7659255246356267	D:/Projects/Kuriosy/Robolox Fight/multiplayer-game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/50526a3i/obj/arm64-v8a/libgame.so	136d47dd8e79a699
+76	3210	7660043673455138	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	349d146689e64600
+22	3232	7660043673670003	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	9302cf86cd22ec01
+31	3262	7660043673990073	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	dcb245e36c18aa5c
+55	3289	7660043674266233	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	927cc904902bf7a0
+47	3360	7660043674986984	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c4f5000dcd3eadbb
+88	3391	7660043675256260	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e17239440d9e6cdf
+65	3657	7660043677974552	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	7a8b65f0f20232c1
+39	3737	7660043678758918	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	5e8d37481e0f1d27
+3738	3948	7660043680740590	D:/Projects/Kuriosy/Robolox Fight/multiplayer-game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/50526a3i/obj/arm64-v8a/libgame.so	136d47dd8e79a699

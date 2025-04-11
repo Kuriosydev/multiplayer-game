@@ -271,6 +271,7 @@ MonoBehaviour:
   _join: 1
   _create: 1
   _connected: 0
+  _randomJoinCreate: 0
 --- !u!4 &50982255
 Transform:
   m_ObjectHideFlags: 0
