@@ -159,7 +159,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             if (_attack)
             {
-                Debug.Log("called");
                 other.gameObject.GetComponent<PlayerMovement>().TakeDamage(10);
                 _attack = false;
             }
