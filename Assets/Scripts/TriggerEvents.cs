@@ -3,7 +3,7 @@ using UnityEngine;
 public class TriggerEvents : MonoBehaviour
 {
     public float rayDistance = 5f; // How far the player can interact
-
+    GameObject _quizPanelHandler, _chestobject;
     public GameObject _quizPanel;
     bool _quizPanelOpened;
 
@@ -21,13 +21,16 @@ public class TriggerEvents : MonoBehaviour
 
                 if(_quizPanelOpened == false)
                 {
-                    Instantiate(_quizPanel);
+                    _quizPanelHandler = Instantiate(_quizPanel);
                     _quizPanelOpened = true;
                 }
             }
             else
             {
-                _quizPanelOpened = false;
+                if (_quizPanelHandler == null)
+                {
+                    _quizPanelOpened = false;
+                }
             }
         }
     }
