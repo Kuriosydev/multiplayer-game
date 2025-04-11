@@ -1,5 +1,7 @@
 using Photon.Pun;
+using TMPro;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,6 +11,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] Transform _orientation;
     [SerializeField] GameObject _leftHand , _rightHand, _dashEffect, _knife1, _knife2;
     public Image _healthbar;
+    [SerializeField] TMP_Text _playerName;
     [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
@@ -41,6 +44,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        _playerName.text = photonView.Owner.NickName;
         _joyStick = FindFirstObjectByType<FixedJoystick>();
         if (photonView.IsMine)
         {
@@ -77,12 +81,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 _animator.SetBool("Death", true);
             }
-            
         }
-        else
-        {
-            HealthBarRotation(_healthbar.gameObject.transform);
-        }
+        //HealthBarRotation(_healthbar.gameObject.transform);
     }
 
     public void AfterDeath()
@@ -378,9 +378,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void HealthBarRotation(Transform _bar)
     {
-        Vector3 _dir = (transform.position - _bar.transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(_bar.transform.position.x, _dir.y, _dir.z));
-        _healthbar.transform.rotation = Quaternion.Slerp(_bar.transform.rotation, lookRotation, 8f * Time.deltaTime);
+        //Vector3 _dir = (transform.position - _bar.transform.position).normalized;
+        //Quaternion lookRotation = Quaternion.LookRotation(new Vector3(_bar.transform.position.x, _dir.y, _dir.z));
+        //_healthbar.transform.rotation = Quaternion.Slerp(_bar.transform.rotation, lookRotation, 8f * Time.deltaTime);
+        Transform _camerapostion = transform;
+        if (photonView.IsMine)
+        {
+            _camerapostion = _followCamera.transform;
+        }
+        _bar.rotation = Quaternion.Euler(0f, _followCamera.transform.rotation.y, 0f);
     }
 
     public void DashForwardReset()
