@@ -2661,7 +2661,6 @@ MonoBehaviour:
   _swordSound: {fileID: 8300000, guid: cad5a75bb9d4e1344b7049dc8bbd27ed, type: 3}
   _dashSound: {fileID: 8300000, guid: b3d93f16e96a9a149b08db0581e44016, type: 3}
   _followCamera: {fileID: 1400711800703588215}
-  _fixedCamera: {fileID: 3352523532058909864}
   _audioSource: {fileID: 7100467973911976674}
   _ground:
     serializedVersion: 2
@@ -2701,7 +2700,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8655305069454029749}
   serializedVersion: 4
-  m_Mass: 20
+  m_Mass: 10
   m_Drag: 8
   m_AngularDrag: 20
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -2991,7 +2990,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8655305069454029749}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b14f0ceb2f8552f4c8414cac28218836, type: 3}
   m_Name: 

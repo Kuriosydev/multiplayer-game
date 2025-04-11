@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
-    [SerializeField] CinemachineThirdPersonFollow _fixedCamera;
+    //[SerializeField] CinemachineThirdPersonFollow _fixedCamera;
     public AudioSource _audioSource;
     Animator _animator;
     [SerializeField] LayerMask _ground;
@@ -46,6 +46,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             _followCamera.gameObject.SetActive(true);
             _healthbar.gameObject.SetActive(false);
+            GetComponent<TriggerEvents>().enabled = true;
         }
     }
 
@@ -54,17 +55,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _healthbar.fillAmount = _currentHealth / 100f;
         if (photonView.IsMine)
         {
-            //GroundCheck();
+            if (!_animator.GetBool("JumpCheck") && _animator.GetInteger("Jump") > 0)
+            {
+                GroundCheck();
+            }
             if (_currentHealth > 0)
             {
+                _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
                 if (_combatMode)
                 {
-                    _orientation.forward = transform.position - new Vector3(_fixedCamera.transform.position.x, transform.position.y, _fixedCamera.transform.position.z);
                     TouchCliked();
+                    TouchControl();
                 }
                 else
                 {
-                    _orientation.forward = transform.position - new Vector3(_followCamera.transform.position.x, transform.position.y, _followCamera.transform.position.z);
                     TouchControl();
                 }
                 JoyStickControl();
@@ -80,28 +84,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             HealthBarRotation(_healthbar.gameObject.transform);
         }
     }
-
-    // function which turn on off camera for fighting and normal mode
-    //public void CombatModeOnOff()
-    //{
-    //    if (photonView.IsMine)
-    //    {
-    //        if (_followCamera.gameObject.activeSelf)
-    //        {
-    //            _followCamera.gameObject.SetActive(false);
-    //            _fixedCamera.gameObject.SetActive(true);
-    //            _combatMode = true;
-    //            _rotationValue = 5f;
-    //        }
-    //        else
-    //        {
-    //            _followCamera.gameObject.SetActive(true);
-    //            _fixedCamera.gameObject.SetActive(false);
-    //            _combatMode = false;
-    //            _rotationValue = 6f;
-    //        }
-    //    }
-    //}
 
     public void AfterDeath()
     {
@@ -120,10 +102,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike", false);
             _hitCounter = 0;
-            _followCamera.gameObject.SetActive(true);
-            _fixedCamera.gameObject.SetActive(false);
+            //_followCamera.gameObject.SetActive(true);
+            //_fixedCamera.gameObject.SetActive(false);
             _combatMode = false;
-            _rotationValue = 6f;
+            //_rotationValue = 6f;
         }
     }
 
@@ -138,10 +120,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike",true);
             _hitCounter = 0;
-            _followCamera.gameObject.SetActive(false);
-            _fixedCamera.gameObject.SetActive(true);
+            //_followCamera.gameObject.SetActive(false);
+            //_fixedCamera.gameObject.SetActive(true);
             _combatMode = true;
-            _rotationValue = 5f;
+            //_rotationValue = 5f;
         }
     }
 
@@ -156,10 +138,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike", true);
             _hitCounter = 0;
-            _followCamera.gameObject.SetActive(false);
-            _fixedCamera.gameObject.SetActive(true);
+            //_followCamera.gameObject.SetActive(false);
+            //_fixedCamera.gameObject.SetActive(true);
             _combatMode = true;
-            _rotationValue = 5f;
+            //_rotationValue = 5f;
         }
     }
 
