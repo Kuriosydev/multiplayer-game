@@ -20,6 +20,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         PhotonNetwork.EnableCloseConnection = true;
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectToBestCloudServer();
+        PhotonNetwork.ConnectToRegion("us");
     }
 
     private void Update()
