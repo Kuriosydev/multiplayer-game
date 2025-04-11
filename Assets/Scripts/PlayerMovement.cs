@@ -87,8 +87,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void AfterDeath()
     {
-        FindFirstObjectByType<UiManager>()._reSpawn = 1;
-        PhotonNetwork.Destroy(gameObject);
+        if (photonView.IsMine)
+        {
+            FindFirstObjectByType<UiManager>()._reSpawn = 1;
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 
     public void NormalsMode()
