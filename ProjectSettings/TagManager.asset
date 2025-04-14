@@ -8,6 +8,7 @@ TagManager:
   - Speaker
   - Chest
   - Quiz
+  - Enemy
   layers:
   - Default
   - TransparentFX
