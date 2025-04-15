@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UiManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] Button _jump, _dash, _mic, _normalMode, _meleeMode, _swordMode;
-    [SerializeField] GameObject _player, _guard;
+    [SerializeField] GameObject _player, _guard, _chief, _trainee;
     PlayerMovement _localPlayer;
     public int _reSpawn = 1;
     [SerializeField] Recorder _recorder;
@@ -23,6 +23,12 @@ public class UiManager : MonoBehaviourPunCallbacks
         _swordMode.onClick.AddListener(SwordMode);
         _dash.onClick.AddListener(Dash);
         _mic.onClick.AddListener(MicOnOff);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.InstantiateRoomObject(_guard.name, _guard.transform.position, Quaternion.identity);
+            PhotonNetwork.InstantiateRoomObject(_chief.name, _chief.transform.position, Quaternion.identity);
+            PhotonNetwork.InstantiateRoomObject(_trainee.name, _trainee.transform.position, Quaternion.identity);
+        }
     }
 
     void Update()
@@ -31,7 +37,6 @@ public class UiManager : MonoBehaviourPunCallbacks
         {
             _reSpawn = 0;
             PhotonNetwork.Instantiate(_player.name, _player.transform.position, Quaternion.identity);
-            PhotonNetwork.InstantiateRoomObject(_guard.name, _guard.transform.position, Quaternion.identity);
             foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
             {
                 if (player.photonView.IsMine)

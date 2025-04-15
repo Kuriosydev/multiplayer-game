@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
-    //[SerializeField] CinemachineThirdPersonFollow _fixedCamera;
     public AudioSource _audioSource;
     Animator _animator;
     [SerializeField] LayerMask _ground;
@@ -58,7 +57,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _healthbar.fillAmount = _currentHealth / 100f;
         if (_currentHealth > 50)
         {
-            _healthbar.color = Color.yellow;
+            _healthbar.color = Color.green;
         }
         else
         {
@@ -101,6 +100,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    void DeathAnimation()
+    {
+        _animator.SetBool("Death", true);
+        _dashEffect.SetActive(false);
+    }
+
+    //Mode Switches;
     public void NormalsMode()
     {
         if (photonView.IsMine)
@@ -113,10 +119,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _animator.SetBool("Strike", false);
             _hitCounter = 0;
             _animator.SetInteger("StrikeNumber", _hitCounter);
-            //_followCamera.gameObject.SetActive(true);
-            //_fixedCamera.gameObject.SetActive(false);
             _combatMode = false;
-            //_rotationValue = 6f;
         }
     }
 
@@ -132,10 +135,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _animator.SetBool("Strike", true);
             _hitCounter = 0;
             _animator.SetInteger("StrikeNumber", _hitCounter);
-            //_followCamera.gameObject.SetActive(false);
-            //_fixedCamera.gameObject.SetActive(true);
             _combatMode = true;
-            //_rotationValue = 5f;
         }
     }
 
@@ -151,18 +151,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _animator.SetBool("Strike", true);
             _hitCounter = 0;
             _animator.SetInteger("StrikeNumber", _hitCounter);
-            //_followCamera.gameObject.SetActive(false);
-            //_fixedCamera.gameObject.SetActive(true);
             _combatMode = true;
-            //_rotationValue = 5f;
         }
     }
 
-    void StrikeCounterUp(int value)
-    {
-        _animator.SetInteger("StrikeNumber", value);
-    }
-
+    // Attack and damage taken section
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
@@ -186,24 +179,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                     other.gameObject.GetComponent<PracticeDummy>().TakeDamage(10);
                 }
                 _attack = false;
-            }
-        }
-    }
-
-    public void Attack()
-    {
-        if (photonView.IsMine)
-        {
-            _attack = true;
-            _soundPlaying = true;
-            _audioSource.Stop();
-            if (_state == 1)
-            {
-                _audioSource.PlayOneShot(_punchSound);
-            }
-            else if (_state == 2)
-            {
-                _audioSource.PlayOneShot(_swordSound);
             }
         }
     }
@@ -237,6 +212,29 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    void StrikeCounterUp(int value)
+    {
+        _animator.SetInteger("StrikeNumber", value);
+    }
+
+    public void Attack()
+    {
+        if (photonView.IsMine)
+        {
+            _attack = true;
+            _soundPlaying = true;
+            _audioSource.Stop();
+            if (_state == 1)
+            {
+                _audioSource.PlayOneShot(_punchSound);
+            }
+            else if (_state == 2)
+            {
+                _audioSource.PlayOneShot(_swordSound);
+            }
+        }
+    }
+
     public void AttackDone()
     {
         _hitCounter += 1;
@@ -248,6 +246,34 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _animator.SetBool("Melee", false);
         _animator.SetBool("Sword", false);
         _canHit = true;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (_currentHealth > 0)
+        {
+            _currentHealth -= damage;
+            photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
+        }
+    }
+
+    [PunRPC]
+    void UpdateHealth(int newHealth)
+    {
+        _currentHealth = newHealth;
+    }
+
+    //Different Land/Water switch;
+    public void WaterSwitch()
+    {
+        _animator.SetBool("InWater", false);
+        _animator.SetInteger("Swim", 0);
+    }
+
+    public void LandSwitch()
+    {
+        _animator.SetBool("InWater", true);
+        _animator.SetInteger("Swim", 1);
     }
 
     public void RunAndWalkSwitch()
@@ -266,6 +292,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //Camera and Joystick Section;
     void TouchControl()
     {
         if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject())
@@ -304,20 +331,27 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 _rb.AddForce(_inputDir.normalized * _speed * _walkSpeed * Time.deltaTime, ForceMode.Force);
                 transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
-                if (_run)
+                if (_animator.GetBool("InWater"))
                 {
-                    _animator.SetBool("Run", true);
-                    if (!_audioSource.isPlaying)
-                    {
-                        _audioSource.PlayOneShot(_runSound);
-                    }
+                    _animator.SetInteger("Swim", 2);
                 }
                 else
                 {
-                    _animator.SetBool("Walk", true);
-                    if (!_audioSource.isPlaying)
+                    if (_run)
                     {
-                        _audioSource.PlayOneShot(_walkSound);
+                        _animator.SetBool("Run", true);
+                        if (!_audioSource.isPlaying)
+                        {
+                            _audioSource.PlayOneShot(_runSound);
+                        }
+                    }
+                    else
+                    {
+                        _animator.SetBool("Walk", true);
+                        if (!_audioSource.isPlaying)
+                        {
+                            _audioSource.PlayOneShot(_walkSound);
+                        }
                     }
                 }
             }
@@ -327,12 +361,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 {
                     _audioSource.Stop();
                 }
+                if (_animator.GetBool("InWater"))
+                {
+                    _animator.SetInteger("Swim", 1);
+                }
                 _animator.SetBool("Run", false);
                 _animator.SetBool("Walk", false);
             }
         }
     }
 
+
+    //Dash and Jump section
     public void DashForward()
     {
         _soundPlaying = true;
@@ -342,19 +382,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
         _rb.AddForce(transform.forward * _speed * _dashForce * Time.deltaTime, ForceMode.Impulse);
     }
-
-    public void GroundCheck()
+    public void DashForwardReset()
     {
-        if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
-        {
-            JumpReset();
-            _canJump = true;
-            _animator.SetBool("JumpCheck", false);
-        }
-        else
-        {
-            _animator.SetBool("JumpCheck", false);
-        }
+        _soundPlaying = false;
+        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
+        _dashEffect.SetActive(false);
+        _animator.SetBool("DashForward", false);
     }
 
     public void Jump()
@@ -388,6 +421,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    public void GroundCheck()
+    {
+        if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
+        {
+            JumpReset();
+            _canJump = true;
+            _animator.SetBool("JumpCheck", false);
+        }
+        else
+        {
+            _animator.SetBool("JumpCheck", false);
+        }
+    }
+
     public void JumpReset()
     {
         _soundPlaying = false;
@@ -396,21 +443,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _animator.SetInteger("Jump", 0);
     }
 
-    public void TakeDamage(int damage)
-    {
-        if (_currentHealth > 0)
-        {
-            _currentHealth -= damage;
-            photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
-        }
-    }
-
-    [PunRPC]
-    void UpdateHealth(int newHealth)
-    {
-        _currentHealth = newHealth;
-    }
-
+    //HealthBarRotation  UnderProgress
     void HealthBarRotation(Transform _bar)
     {
         //Vector3 _dir = (transform.position - _bar.transform.position).normalized;
@@ -424,21 +457,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _bar.rotation = Quaternion.Euler(0f, _followCamera.transform.rotation.y, 0f);
     }
 
-    public void DashForwardReset()
-    {
-        _soundPlaying = false;
-        photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
-        _dashEffect.SetActive(false);
-        _animator.SetBool("DashForward", false);
-    }
-
-    void DeathAnimation()
-    {
-        _animator.SetBool("Death", true);
-        _dashEffect.SetActive(false);
-    }
-
-
+    //Object on/off on network
     [PunRPC]
     void ObjectTurnOn(int viewId)
     {

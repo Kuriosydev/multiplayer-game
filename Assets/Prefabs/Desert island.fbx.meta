@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 258aca2ef13f65e4ca158b696a6f8f3c
+guid: f0780aefffb1bf946b1725b5a27915d6
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -8,27 +8,27 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: BeachSandMaterial_0
-    second: {fileID: 2100000, guid: db079152a4bdba048bc8365c94f15966, type: 2}
+    second: {fileID: 2100000, guid: 8c20be6d9d2310c41ab25eaa4b7008fd, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: LevelMaterial_0
-    second: {fileID: 2100000, guid: 8c4bbc19d9e51634481e3a5e1651cbe5, type: 2}
+    second: {fileID: 2100000, guid: 9e6248f98e585974c91fbbcd6f0bfe61, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: SandRockMaterial_0
-    second: {fileID: 2100000, guid: c3e314ee079fbf14abfad9a2d854b6a0, type: 2}
+    second: {fileID: 2100000, guid: d502a6a8a60137142bbe3495f6014e81, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: SandRockRedMaterial_0
-    second: {fileID: 2100000, guid: 2876f3545f5400e409e9a197407d38d2, type: 2}
+    second: {fileID: 2100000, guid: 810d14dd922378a489cb929a976a5664, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: WaterMaterialTransparent_0
-    second: {fileID: 2100000, guid: 58315f4ae73ac03448d99319b24ef2d8, type: 2}
+    second: {fileID: 2100000, guid: c28548058434e644892260c591779dfb, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

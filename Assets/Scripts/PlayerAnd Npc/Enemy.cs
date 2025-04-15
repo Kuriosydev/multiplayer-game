@@ -7,9 +7,9 @@ public class Enemy : MonoBehaviourPunCallbacks
 {
     NavMeshAgent _agent;
     PlayerMovement _player;
-    Transform _startPos, _target;
-    [SerializeField] int _range = 5;
-    public int _currentHealth, _maxHealth = 100;
+    Transform _target;
+    Vector3 _startPos;
+    [SerializeField] int _range = 5, _currentHealth, _maxHealth = 100, _attackDamage = 10;
     public Image _healthbar;
     Animator _animator;
     bool _canHit = true;
@@ -18,7 +18,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     void Start()
     {
         _currentHealth = _maxHealth;
-        _startPos = transform;
+        _startPos = transform.position;
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
     }
@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviourPunCallbacks
         _healthbar.fillAmount = _currentHealth / 100f;
         if (_currentHealth > 50)
         {
-            _healthbar.color = Color.yellow;
+            _healthbar.color = Color.green;
         }
         else
         {
@@ -61,7 +61,7 @@ public class Enemy : MonoBehaviourPunCallbacks
                     _agent.velocity = Vector3.zero;
                     _animator.SetBool("Run", false);
                     _animator.SetBool("Attack", true);
-                    EnemyAttack();
+                    Attack();
                 }
                 else
                 {
@@ -76,8 +76,8 @@ public class Enemy : MonoBehaviourPunCallbacks
             }
             else
             {
-                _agent.SetDestination(_startPos.position);
-                if (Vector3.Distance(transform.position, _startPos.position) <= _agent.stoppingDistance)
+                _agent.SetDestination(_startPos);
+                if (Vector3.Distance(transform.position, _startPos) <= _agent.stoppingDistance)
                 {
                     _agent.velocity = Vector3.zero;
                     _animator.SetBool("Run", false);
@@ -107,7 +107,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     {
         if (_target != null)
         {
-            faceTarget(_target);
+            faceTarget(_target.position);
         }
         else
         {
@@ -115,11 +115,11 @@ public class Enemy : MonoBehaviourPunCallbacks
         }
     }
 
-    void EnemyAttack()
+    public void Attack()
     {
         if (_canHit)
         {
-            _target.gameObject.GetComponent<PlayerMovement>().TakeDamage(10);
+            _target.gameObject.GetComponent<PlayerMovement>().TakeDamage(_attackDamage);
             _animator.SetInteger("StrikeNumber", _hitCounter);
             _canHit = false;
         }
@@ -157,9 +157,9 @@ public class Enemy : MonoBehaviourPunCallbacks
         _currentHealth = newHealth;
     }
 
-    void faceTarget(Transform _lookAt)
+    void faceTarget(Vector3 _lookAt)
     {
-        Vector3 dir = (_lookAt.position - transform.position).normalized;
+        Vector3 dir = (_lookAt - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(dir.x, transform.position.y, dir.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 5f * Time.deltaTime);
     }
