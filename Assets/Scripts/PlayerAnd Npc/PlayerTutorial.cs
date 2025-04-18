@@ -273,6 +273,7 @@ public class PlayerTutorial : MonoBehaviour
     public void SwordMode()
     {
             this.transform.localPosition = new Vector3(40,58,29);
+            this.transform.localRotation = Quaternion.identity;
             _state = 2;
             _animator.SetBool("Strike", true);
             _hitCounter = 0;

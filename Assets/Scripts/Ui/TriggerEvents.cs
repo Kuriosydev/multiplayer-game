@@ -5,33 +5,41 @@ public class TriggerEvents : MonoBehaviour
     public float rayDistance = 5f; // How far the player can interact
     GameObject _quizPanelHandler, _chestobject;
     public GameObject _quizPanel;
-    bool _quizPanelOpened;
+    //bool _quizPanelOpened;
 
     // Update is called once per frame
-    void Update()
+    //void Update()
+    //{
+    //    Ray ray = new Ray(transform.position, transform.forward);
+    //    RaycastHit hit;
+
+    //    if (Physics.Raycast(ray, out hit, rayDistance))
+    //    {
+    //        if (hit.collider.CompareTag("Chest"))
+    //        {
+    //            //Debug.Log("Chest detected at distance: " + hit.distance);
+
+    //            if(_quizPanelOpened == false)
+    //            {
+    //                _quizPanelHandler = Instantiate(_quizPanel);
+    //                _quizPanelOpened = true;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            if (_quizPanelHandler == null)
+    //            {
+    //                _quizPanelOpened = false;
+    //            }
+    //        }
+    //    }
+    //}
+
+    private void OnTriggerEnter(Collider other)
     {
-        Ray ray = new Ray(transform.position, transform.forward);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, rayDistance))
+        if (other.CompareTag("Chest"))
         {
-            if (hit.collider.CompareTag("Chest"))
-            {
-                //Debug.Log("Chest detected at distance: " + hit.distance);
-
-                if(_quizPanelOpened == false)
-                {
-                    _quizPanelHandler = Instantiate(_quizPanel);
-                    _quizPanelOpened = true;
-                }
-            }
-            else
-            {
-                if (_quizPanelHandler == null)
-                {
-                    _quizPanelOpened = false;
-                }
-            }
+          _quizPanelHandler = Instantiate(_quizPanel);
         }
     }
 }
