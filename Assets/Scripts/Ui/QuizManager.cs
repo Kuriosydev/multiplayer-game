@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 public class QuizManager : MonoBehaviour
 {
@@ -17,9 +18,16 @@ public class QuizManager : MonoBehaviour
     private int currentQuestionIndex = 0;
     private int score = 0;
 
-    public TMP_Text questionText;
-    public TMP_Text scoreText;
+    public TMP_Text questionText,_resultText;
     public Button[] optionButtons;
+
+    string hexCorrectColor = "#4EEE45";
+    string hexWrongColor = "#FA7D78";
+    string hexDefaultColor = "#70CCFF";
+    Color newColor;
+
+    [SerializeField]
+    PlayerTutorial _tutorial;
 
     void Start()
     {
@@ -28,8 +36,7 @@ public class QuizManager : MonoBehaviour
 
     void DisplayQuestion()
     {
-        if (currentQuestionIndex < questions.Count)
-        {
+       
             Question q = questions[currentQuestionIndex];
             questionText.text = q.questionText;
 
@@ -42,24 +49,45 @@ public class QuizManager : MonoBehaviour
                 optionButtons[i].onClick.RemoveAllListeners();
                 optionButtons[i].onClick.AddListener(() => OnAnswerSelected(index));
             }
-
-            scoreText.text = "Score: " + score;
-        }
-        else
-        {
-            questionText.text = "Quiz Finished!";
-            scoreText.text = "Final Score: " + score;
-            foreach (var btn in optionButtons)
-                btn.gameObject.SetActive(false);
-        }
     }
 
     void OnAnswerSelected(int index)
     {
         if (index == questions[currentQuestionIndex].correctAnswerIndex)
-            score++;
+        {
+            //score++;
+            ChangeButtonColor(hexCorrectColor);
+            optionButtons[index].transform.GetComponent<Image>().color = newColor;
+            _tutorial.SwordMode();
+        }
+        else
+        {
+            ChangeButtonColor(hexWrongColor);
+            optionButtons[index].transform.GetComponent<Image>().color = newColor;
+            _resultText.text = "Wrong !!! Try Again !";
+            StartCoroutine(ResetQuestion());
+        }
+    }
 
-        currentQuestionIndex++;
-        DisplayQuestion();
+    public void ChangeButtonColor(string hex)
+    {
+
+        if (ColorUtility.TryParseHtmlString(hex, out newColor))
+        {
+            // Change button background color
+            //targetButton.image.color = newColor;
+        }
+        else
+        {
+            Debug.LogError("Invalid Hex Color Code: " + hex);
+        }
+    }
+
+    IEnumerator ResetQuestion()
+    {
+        yield return new WaitForSeconds(2f);
+        ChangeButtonColor(hexDefaultColor);
+        optionButtons[1].transform.GetComponent<Image>().color = newColor;
+        _resultText.text = string.Empty;
     }
 }

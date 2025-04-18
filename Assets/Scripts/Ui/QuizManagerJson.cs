@@ -70,6 +70,8 @@ public class QuizManagerJson : MonoBehaviour
 
     IEnumerator LoadQuestions()
     {
+        //TextAsset jsonFile = Resources.Load<TextAsset>("questions");
+
         string filePath = Path.Combine(Application.streamingAssetsPath, "questions.json");
 
         UnityWebRequest www = UnityWebRequest.Get(filePath);
