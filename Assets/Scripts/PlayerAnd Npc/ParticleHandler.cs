@@ -37,7 +37,7 @@ public class ParticleHandler : MonoBehaviour
                 }
                 if (other.collider.gameObject.CompareTag("Enemy"))
                 {
-                    other.collider.gameObject.GetComponent<Enemy>().TakeDamage(_player.GetComponent<PlayerMovement>()._damage);
+                    other.collider.gameObject.GetComponent<Enemy>().TakeDamage(_player.GetComponent<PlayerMovement>()._damage,_player);
                     if (_photonView.IsMine)
                     {
                         PhotonNetwork.Destroy(gameObject);

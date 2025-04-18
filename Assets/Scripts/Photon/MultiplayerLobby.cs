@@ -16,14 +16,15 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        if (!PlayerPrefs.HasKey("Tutorial"))
-        {
-            SceneManager.LoadScene(2);
-        }
+        //if (!PlayerPrefs.HasKey("Tutorial"))
+        //{
+        //    SceneManager.LoadScene(2);
+        //}
     }
 
     private void Start()
     {
+        PlayerPrefs.SetInt("Exp", 100);
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.EnableCloseConnection = true;
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -56,20 +57,12 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
                     {
                         PhotonNetwork.LocalPlayer.NickName = _playerName.text;
                     }
-                    else
-                    {
-                        PhotonNetwork.LocalPlayer.NickName = "UnKnown";
-                    }
                 }
                 else
                 {
                     if (_randomPlayerName.text.Length > 1)
                     {
                         PhotonNetwork.LocalPlayer.NickName = _randomPlayerName.text;
-                    }
-                    else
-                    {
-                        PhotonNetwork.LocalPlayer.NickName = "UnKnown";
                     }
                 }
             }

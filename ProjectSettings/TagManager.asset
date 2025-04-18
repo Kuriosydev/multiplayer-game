@@ -9,6 +9,7 @@ TagManager:
   - Chest
   - Quiz
   - Enemy
+  - HealthBar
   layers:
   - Default
   - TransparentFX

@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public int _maxHealth = 100, _maxEnergy = 100, _runForce = 6000,
         _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
         _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
-        _energyRegain = 5, _energyDeduction = 15;
+        _energyRegain = 5, _energyDeduction = 15, _exp, _level;
     public float _currentHealth, _defence, _currentEnergy;
     float _speed = 15f, _rotationValue = 6f;
     float _defenceAdd;
@@ -32,8 +32,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        _maxHealth = _maxHealth + (FindFirstObjectByType<UiManager>()._level * _healthAdd);
-        _damage = _damage + (FindFirstObjectByType<UiManager>()._level * _attackAdd);
+        _exp = PlayerPrefs.GetInt("Exp");
+        _maxHealth = _maxHealth + (_level * _healthAdd);
+        _damage = _damage + (_level * _attackAdd);
         _maxEnergy = _maxHealth;
         _defence = _maxHealth / 2;
         _currentHealth = _maxHealth;
@@ -64,10 +65,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void LevelUp()
     {
-        _maxHealth = 100 + (FindFirstObjectByType<UiManager>()._level * _healthAdd);
-        _damage = 10 + FindFirstObjectByType<UiManager>()._level * _attackAdd;
+        _exp = PlayerPrefs.GetInt("Exp");
+        if (_exp % 50 == 0)
+        {
+            _level = (int)(_exp / 100);
+        }
+        _maxHealth = 100 + (_level * _healthAdd);
+        _damage = 10 + (_level * _attackAdd);
         _maxEnergy = _maxHealth;
         _defence = _maxHealth / 2;
+    }
+
+    public void ExpIncrease(int _value)
+    {
+        PlayerPrefs.SetInt("Exp", PlayerPrefs.GetInt("Exp") + _value);
     }
 
     void Update()
@@ -92,6 +103,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         if (photonView.IsMine)
         {
+            LevelUp();
             if (!_animator.GetBool("JumpCheck") && _animator.GetInteger("Jump") > 0)
             {
                 GroundCheck();
@@ -115,7 +127,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 _animator.SetBool("Death", true);
             }
         }
-        //HealthBarRotation(_healthbar.gameObject.transform);
+        HealthBarRotation();
     }
 
     public void AfterDeath()
@@ -209,6 +221,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
         }
     }
+
     public void DevilFruitMode()
     {
         if (photonView.IsMine)
@@ -278,7 +291,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 {
                     if (other.gameObject.GetComponent<Enemy>())
                     {
-                        other.gameObject.GetComponent<Enemy>().TakeDamage(_damage);
+                        other.gameObject.GetComponent<Enemy>().TakeDamage(_damage, gameObject);
                     }
                 }
                 _attack = false;
@@ -342,13 +355,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
-    public void ExpIncrease(int _amount)
-    {
-        if (photonView.IsMine)
-        {
-            FindAnyObjectByType<UiManager>()._totalExp += _amount;
-        }
-    }
+    //public void ExpIncrease(int _amount)
+    //{
+    //    if (photonView.IsMine)
+    //    {
+    //         PlayerPrefs.SetInt("Exp", PlayerPrefs.GetInt("Exp") + _amount);
+    //    }
+    //}
 
     void StrikeCounterUp(int value)
     {
@@ -529,10 +542,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             if (_currentEnergy > _energyDeduction && _canDash)
             {
-                _soundPlaying = true;
-                _audioSource.Stop();
                 _canDash = false;
-                _audioSource.PlayOneShot(_dashSound);
                 _animator.SetBool("DashForward", true);
                 photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
             }
@@ -541,6 +551,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void DashForce()
     {
+        _soundPlaying = true;
+        _audioSource.Stop();
+        _audioSource.PlayOneShot(_dashSound);
         _rb.AddForce(transform.forward * _speed * _dashForce * Time.deltaTime, ForceMode.Impulse);
         _currentEnergy -= _energyDeduction;
     }
@@ -618,7 +631,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     }
 
     //HealthBarRotation  UnderProgress
-    void HealthBarRotation(Transform _bar)
+    void HealthBarRotation()
     {
         //Vector3 _dir = (transform.position - _bar.transform.position).normalized;
         //Quaternion lookRotation = Quaternion.LookRotation(new Vector3(_bar.transform.position.x, _dir.y, _dir.z));
@@ -628,7 +641,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             _camerapostion = _followCamera.transform;
         }
-        _bar.rotation = Quaternion.Euler(0f, _followCamera.transform.rotation.y, 0f);
+        foreach (GameObject _bar in GameObject.FindGameObjectsWithTag("HealthBar"))
+        {
+            _bar.transform.rotation = _camerapostion.transform.rotation;
+        }
     }
 
     //Object on/off on network

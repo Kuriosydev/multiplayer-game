@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     Transform _target;
     public Vector3 _startPos;
     [SerializeField] int _range, _maxHealth, _attackDamage, _healthRegernation, _expIncrement;
+    GameObject _hitter;
     [SerializeField] float _damageFactor, _currentHealth;
     public Image _healthbar;
     Animator _animator;
@@ -20,17 +21,27 @@ public class Enemy : MonoBehaviourPunCallbacks
     void Start()
     {
         transform.position = _startPos;
+        photonView.RPC("UpdateStartPos", RpcTarget.AllBuffered, _startPos);
         _currentHealth = _maxHealth;
         UpdateHealth(_currentHealth);
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _animator.SetBool("Death", false);
         _agent.stoppingDistance = _stoppingDistance;
+    }
 
+    [PunRPC]
+    void UpdateStartPos(Vector3 _startPosition)
+    {
+        _startPos = _startPosition;
     }
 
     void Update()
     {
+        if(_startPos == Vector3.zero)
+        {
+            _startPos = transform.position;
+        }
         _healthbar.fillAmount = _currentHealth / _maxHealth;
         if (_currentHealth < _maxHealth && _currentHealth > 0)
         {
@@ -105,11 +116,14 @@ public class Enemy : MonoBehaviourPunCallbacks
         }
     }
 
-
     public void AfterDeath()
     {
         UpdateHealth(_maxHealth);
-        FindAnyObjectByType<UiManager>()._totalExp += _expIncrement;
+        //FindAnyObjectByType<UiManager>()._localPlayer.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+        if (_hitter.CompareTag("Player"))
+        {
+            _hitter.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+        }
         FindAnyObjectByType<UiManager>().RespawnEnemies(photonView.ViewID);
         ObjectTurnOff(photonView.ViewID);
     }
@@ -154,10 +168,11 @@ public class Enemy : MonoBehaviourPunCallbacks
         _canHit = true;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, GameObject _theplayer)
     {
         if (_currentHealth > 0)
         {
+            _hitter = _theplayer;
             _currentHealth -= damage;// * _damageFactor;
             photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
             _animator.SetBool("GotHit", true);
@@ -172,7 +187,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     [PunRPC]
     void UpdateHealth(float newHealth)
     {
-            _currentHealth = newHealth;
+        _currentHealth = newHealth;
     }
 
     void faceTarget(Vector3 _lookAt)

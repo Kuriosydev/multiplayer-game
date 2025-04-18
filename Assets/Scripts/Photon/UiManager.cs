@@ -64,23 +64,42 @@ public class UiManager : MonoBehaviourPunCallbacks
                 if (player.photonView.IsMine)
                 {
                     _localPlayer = player;
+                    if(PhotonNetwork.LocalPlayer.NickName == "")
+                    {
+                        PhotonNetwork.LocalPlayer.NickName = "Player" + PhotonNetwork.LocalPlayer.ActorNumber.ToString();
+                    }
                 }
+            }
+        }
+        if (PhotonNetwork.MasterClient.IsInactive)
+        {
+            //foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            //{
+            //    // Optionally reinitialize anything if needed
+            //    enemy.enabled = false;
+            //}
+            if (!PhotonNetwork.LocalPlayer.IsMasterClient)
+            {
+                PhotonNetwork.SetMasterClient(PhotonNetwork.LocalPlayer);
+            }
+        }
+        else
+        {
+            foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            {
+                // Optionally reinitialize anything if needed
+                enemy.enabled = true;
             }
         }
         if (_localPlayer != null)
         {
             _energyBar.fillAmount = _localPlayer._currentEnergy / _localPlayer._maxEnergy;
             _healthBar.fillAmount = _localPlayer._currentHealth / _localPlayer._maxHealth;
-            if (_totalExp % 50 == 0)
-            {
-                _level = (int)(_totalExp / 100);
-                _levelText.text = "Level " + _level.ToString();
-                _localPlayer.LevelUp();
-            }
             if(_devilFruit > 0)
             {
                 _devilMode.gameObject.SetActive(true);
             }
+            _levelText.text = "Level " + _localPlayer._level.ToString();
         }
     }
 
@@ -156,12 +175,12 @@ public class UiManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient)
         {
             // Find all NPCs and enable their logic again
-            foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
-            {
-                // Optionally reinitialize anything if needed
-                enemy.enabled = false;
-                enemy.enabled = true; // make sure script is active
-            }
+            //foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            //{
+            //    // Optionally reinitialize anything if needed
+            //    enemy.enabled = false;
+            //    enemy.enabled = true; // make sure script is active
+            //}
         }
     }
 
