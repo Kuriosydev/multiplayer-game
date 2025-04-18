@@ -14,6 +14,14 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     public bool _join = true, _create = true, _connected = false, _randomJoinCreate = false;
     //[SerializeField] Toggle _visiblehandler;
 
+    private void Awake()
+    {
+        if (!PlayerPrefs.HasKey("Tutorial"))
+        {
+            SceneManager.LoadScene(2);
+        }
+    }
+
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
@@ -127,7 +135,6 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
         else
         {
-            PhotonNetwork.KeepAliveInBackground = 300;
             _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
             _roomJoiningPanel.SetActive(false);
             _waitingRoomPanel.SetActive(true);

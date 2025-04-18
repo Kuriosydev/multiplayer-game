@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "C:/Users/Administrator/Documents/GitHub/multiplayer-game/Library/PramData/AndroidApplicationController/Cache/com.UnityTechnologies.com.unity.template.urpblank/gradle-project/unityLibrary/build/intermediates/cxx/Debug/1r2e4i6x/obj/arm64-v8a/libgame.so"
+			"path" : "C:/Users/Administrator/Documents/GitHub/multiplayer-game/Library/PramData/AndroidApplicationController/Cache/com.Kurixel.MathsFun/gradle-project/unityLibrary/build/intermediates/cxx/Debug/1r2e4i6x/obj/arm64-v8a/libgame.so"
 		}
 	],
 	"backtrace" : 1,
@@ -73,7 +73,7 @@
 			[
 				{
 					"backtrace" : 4,
-					"path" : "C:/Users/Administrator/Documents/GitHub/multiplayer-game/Library/PramData/AndroidApplicationController/Cache/com.UnityTechnologies.com.unity.template.urpblank/gradle-project/unityLibrary/src/main/cpp/GameActivity"
+					"path" : "C:/Users/Administrator/Documents/GitHub/multiplayer-game/Library/PramData/AndroidApplicationController/Cache/com.Kurixel.MathsFun/gradle-project/unityLibrary/src/main/cpp/GameActivity"
 				},
 				{
 					"backtrace" : 2,

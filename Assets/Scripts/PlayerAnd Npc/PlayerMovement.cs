@@ -8,27 +8,37 @@ using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     [SerializeField] Transform _orientation;
-    [SerializeField] GameObject _leftHand, _rightHand, _dashEffect, _knife1, _knife2;
+    [SerializeField] GameObject _leftHand, _rightHand, _dashEffect, _knife1, _knife2, _spawnLocation, _devilFruit1, _devilFruit2;
     public Image _healthbar;
     [SerializeField] TMP_Text _playerName;
-    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound;
+    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
     public AudioSource _audioSource;
     Animator _animator;
     [SerializeField] LayerMask _ground;
     Rigidbody _rb;
-    public int _currentHealth, _maxHealth = 100, _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10, _sensitivity = 10;
+    public int _maxHealth = 100, _maxEnergy = 100, _runForce = 6000,
+        _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
+        _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
+        _energyRegain = 5, _energyDeduction = 15;
+    public float _currentHealth, _defence, _currentEnergy;
     float _speed = 15f, _rotationValue = 6f;
-    public float _walkSpeed;
+    float _defenceAdd;
     Vector3 _inputDir;
     RaycastHit _hit;
     int _state = 0, _hitCounter = 0, _jumpCount = 0;
-    bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying = false;
+    bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying = false, _canDash = true;
 
     private void Awake()
     {
+        _maxHealth = _maxHealth + (FindFirstObjectByType<UiManager>()._level * _healthAdd);
+        _damage = _damage + (FindFirstObjectByType<UiManager>()._level * _attackAdd);
+        _maxEnergy = _maxHealth;
+        _defence = _maxHealth / 2;
         _currentHealth = _maxHealth;
+        _currentEnergy = _maxEnergy;
+        _defenceAdd = _healthAdd / 2;
         _animator = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
         _rb = GetComponent<Rigidbody>();
@@ -52,9 +62,26 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    public void LevelUp()
+    {
+        _maxHealth = 100 + (FindFirstObjectByType<UiManager>()._level * _healthAdd);
+        _damage = 10 + FindFirstObjectByType<UiManager>()._level * _attackAdd;
+        _maxEnergy = _maxHealth;
+        _defence = _maxHealth / 2;
+    }
+
     void Update()
     {
-        _healthbar.fillAmount = _currentHealth / 100f;
+        _healthbar.fillAmount = _currentHealth / _maxHealth;
+        if (_currentHealth < _maxHealth && _currentHealth > 0)
+        {
+            _currentHealth += _healthRegain * Time.deltaTime;
+            UpdateHealth(_currentHealth);
+        }
+        if(_currentEnergy < _maxEnergy)
+        {
+            _currentEnergy += _energyRegain * Time.deltaTime;
+        }
         if (_currentHealth > 50)
         {
             _healthbar.color = Color.green;
@@ -118,8 +145,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
             _animator.SetBool("Strike", false);
             _hitCounter = 0;
+            _attackAdd = 20;
             _animator.SetInteger("StrikeNumber", _hitCounter);
             _combatMode = false;
+            transform.localScale = new Vector3(1, 1, 1);
+            _orientation.localPosition = new Vector3(0, 0.6f, 0);
+            _followCamera.Radius = 10;
         }
     }
 
@@ -127,15 +158,27 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
-            _state = 1;
-            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
-            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
-            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
-            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
-            _animator.SetBool("Strike", true);
-            _hitCounter = 0;
-            _animator.SetInteger("StrikeNumber", _hitCounter);
-            _combatMode = true;
+            if (_state != 1)
+            {
+                _state = 1;
+                photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
+                _animator.SetBool("Strike", true);
+                _hitCounter = 0;
+                _attackAdd = 20;
+                _animator.SetInteger("StrikeNumber", _hitCounter);
+                _combatMode = true;
+                transform.localScale = new Vector3(1, 1, 1);
+                _orientation.localPosition = new Vector3(0, 0.6f, 0);
+                _followCamera.Radius = 10;
+            }
+            else
+            {
+                _state = 0;
+                NormalsMode();
+            }
         }
     }
 
@@ -143,15 +186,66 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
-            _state = 2;
-            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
-            photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
-            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
-            photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
-            _animator.SetBool("Strike", true);
-            _hitCounter = 0;
-            _animator.SetInteger("StrikeNumber", _hitCounter);
-            _combatMode = true;
+            if (_state != 2)
+            {
+                _state = 2;
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
+                _animator.SetBool("Strike", true);
+                _hitCounter = 0;
+                _animator.SetInteger("StrikeNumber", _hitCounter);
+                _combatMode = true;
+                _attackAdd = 20;
+                transform.localScale = new Vector3(1, 1, 1);
+                _orientation.localPosition = new Vector3(0, 0.6f, 0);
+                _followCamera.Radius = 10;
+            }
+            else
+            {
+                _state = 0;
+                NormalsMode();
+            }
+        }
+    }
+    public void DevilFruitMode()
+    {
+        if (photonView.IsMine)
+        {
+            if (_state != 3)
+            {
+                _state = 3;
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife1.GetComponent<PhotonView>().ViewID);
+                photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _knife2.GetComponent<PhotonView>().ViewID);
+                _animator.SetBool("Strike", true);
+                _hitCounter = 0;
+                _animator.SetInteger("StrikeNumber", _hitCounter);
+                _combatMode = true;
+                if (FindFirstObjectByType<UiManager>()._devilFruit == 3)
+                {
+                    transform.localScale = new Vector3(3, 3, 3);
+                    _orientation.localPosition = new Vector3(0, 0.1f, 0);
+                    _attackAdd = 40;
+                    _followCamera.Radius = 20;
+                    photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _leftHand.GetComponent<PhotonView>().ViewID);
+                    photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _rightHand.GetComponent<PhotonView>().ViewID);
+                }
+                else
+                {
+                    _attackAdd = 20;
+                    _followCamera.Radius = 10;
+                    transform.localScale = new Vector3(1, 1, 1);
+                    _orientation.localPosition = new Vector3(0, 0.6f, 0);
+                }
+            }
+            else
+            {
+                _state = 0;
+                NormalsMode();
+            }
         }
     }
 
@@ -162,27 +256,46 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             if (_attack)
             {
-                other.gameObject.GetComponent<PlayerMovement>().TakeDamage(10);
+                if (_state != 3 || FindAnyObjectByType<UiManager>()._devilFruit == 3)
+                {
+                    other.gameObject.GetComponent<PlayerMovement>().TakeDamage(_damage);
+                }
                 _attack = false;
             }
         }
         if (other.gameObject.CompareTag("Enemy"))
         {
+            if (FindAnyObjectByType<UiManager>()._devilFruit == 3)
+            {
+                if (other.gameObject.transform.localScale.y < 3)
+                {
+                    other.GetComponent<Enemy>()._agent.stoppingDistance = 2.5f;
+                }
+            }
             if (_attack)
             {
-                if (other.gameObject.GetComponent<Enemy>())
+                if (_state != 3 || FindAnyObjectByType<UiManager>()._devilFruit == 3)
                 {
-                    other.gameObject.GetComponent<Enemy>().TakeDamage(10);
-                }
-                else if (other.gameObject.GetComponent<PracticeDummy>())
-                {
-                    other.gameObject.GetComponent<PracticeDummy>().TakeDamage(10);
+                    if (other.gameObject.GetComponent<Enemy>())
+                    {
+                        other.gameObject.GetComponent<Enemy>().TakeDamage(_damage);
+                    }
                 }
                 _attack = false;
             }
         }
     }
 
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            if (other.gameObject.transform.localScale.y < 3)
+            {
+                other.GetComponent<Enemy>()._agent.stoppingDistance = 1.5f;
+            }
+        }
+    }
     public void TouchCliked()
     {
         if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject() && _currentHealth > 0)
@@ -197,7 +310,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                         {
                             _canHit = false;
                             StrikeCounterUp(_hitCounter);
-                            if (_state == 1)
+                            if (_state == 1 || _state == 3)
                             {
                                 _animator.SetBool("Melee", true);
                             }
@@ -209,6 +322,31 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                     }
                 }
             }
+        }
+    }
+
+    public void FruitPower(int _fruit)
+    {
+        if (photonView.IsMine)
+        {
+            if (_fruit == 1)
+            {
+                GameObject _fruitContainer = PhotonNetwork.Instantiate(_devilFruit1.name, _spawnLocation.transform.position, transform.rotation);
+                _fruitContainer.GetComponent<ParticleHandler>().PlayerSetUp(gameObject);
+            }
+            else if (_fruit == 2)
+            {
+                GameObject _fruitContainer = PhotonNetwork.Instantiate(_devilFruit2.name, _spawnLocation.transform.position, transform.rotation);
+                _fruitContainer.GetComponent<ParticleHandler>().PlayerSetUp(gameObject);
+            }
+        }
+    }
+
+    public void ExpIncrease(int _amount)
+    {
+        if (photonView.IsMine)
+        {
+            FindAnyObjectByType<UiManager>()._totalExp += _amount;
         }
     }
 
@@ -232,6 +370,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 _audioSource.PlayOneShot(_swordSound);
             }
+            if (_state == 3)
+            {
+                FruitPower(FindAnyObjectByType<UiManager>()._devilFruit);
+            }
         }
     }
 
@@ -242,6 +384,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             _hitCounter = 0;
         }
+        _attack = false;
         _soundPlaying = false;
         _animator.SetBool("Melee", false);
         _animator.SetBool("Sword", false);
@@ -258,9 +401,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void UpdateHealth(int newHealth)
+    void UpdateHealth(float newHealth)
     {
-        _currentHealth = newHealth;
+        if (photonView.IsMine)
+        {
+            _currentHealth = newHealth;
+        }
     }
 
     //Different Land/Water switch;
@@ -329,11 +475,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _inputDir = _orientation.forward * _joyStick.Vertical + _orientation.right * _joyStick.Horizontal;
             if (_inputDir.magnitude != 0)
             {
-                _rb.AddForce(_inputDir.normalized * _speed * _walkSpeed * Time.deltaTime, ForceMode.Force);
+                _rb.AddForce(_inputDir.normalized * _speed * _runForce * Time.deltaTime, ForceMode.Force);
                 transform.forward = Vector3.Lerp(transform.forward, _inputDir.normalized, _rotationValue * Time.deltaTime);
                 if (_animator.GetBool("InWater"))
                 {
                     _animator.SetInteger("Swim", 2);
+                    if (!_audioSource.isPlaying)
+                    {
+                        _audioSource.PlayOneShot(_swimSound);
+                    }
                 }
                 else
                 {
@@ -375,16 +525,30 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     //Dash and Jump section
     public void DashForward()
     {
-        _soundPlaying = true;
-        _audioSource.Stop();
-        _audioSource.PlayOneShot(_dashSound);
-        _animator.SetBool("DashForward", true);
-        photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
-        _rb.AddForce(transform.forward * _speed * _dashForce * Time.deltaTime, ForceMode.Impulse);
+        if (photonView.IsMine)
+        {
+            if (_currentEnergy > _energyDeduction && _canDash)
+            {
+                _soundPlaying = true;
+                _audioSource.Stop();
+                _canDash = false;
+                _audioSource.PlayOneShot(_dashSound);
+                _animator.SetBool("DashForward", true);
+                photonView.RPC("ObjectTurnOn", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
+            }
+        }
     }
+
+    public void DashForce()
+    {
+        _rb.AddForce(transform.forward * _speed * _dashForce * Time.deltaTime, ForceMode.Impulse);
+        _currentEnergy -= _energyDeduction;
+    }
+
     public void DashForwardReset()
     {
         _soundPlaying = false;
+        _canDash = true;
         photonView.RPC("ObjectTurnOff", RpcTarget.AllBuffered, _dashEffect.GetComponent<PhotonView>().ViewID);
         _dashEffect.SetActive(false);
         _animator.SetBool("DashForward", false);
@@ -397,27 +561,38 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f, _ground))
             {
                 _animator.SetBool("JumpCheck", true);
-                _soundPlaying = true;
-                _audioSource.Stop();
-                _audioSource.PlayOneShot(_jumpSound);
                 _jumpCount = 1;
                 _animator.SetInteger("Jump", _jumpCount);
-                _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
                 _canJump = false;
             }
-            else if (_jumpCount == 1)
+            else if (_jumpCount == 1 && _currentEnergy > _energyDeduction)
             {
-                _soundPlaying = true;
-                _audioSource.Stop();
-                _audioSource.PlayOneShot(_doubleJumpSound);
                 _jumpCount = 2;
                 _animator.SetInteger("Jump", _jumpCount);
-                _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
             }
             else
             {
                 _jumpCount = 0;
             }
+        }
+    }
+
+    public void JumpForce()
+    {
+        _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
+        if (_jumpCount == 1)
+        {
+            _soundPlaying = true;
+            _audioSource.Stop();
+            _audioSource.PlayOneShot(_jumpSound);
+        }
+        else if (_jumpCount == 2)
+        {
+            _currentEnergy -= _energyDeduction;
+            _soundPlaying = true;
+            _audioSource.Stop();
+            _audioSource.PlayOneShot(_doubleJumpSound);
+            _currentEnergy -= _energyDeduction;
         }
     }
 
@@ -427,7 +602,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             JumpReset();
             _canJump = true;
-            _animator.SetBool("JumpCheck", false);
         }
         else
         {

@@ -32,8 +32,8 @@ RectTransform:
   m_Children:
   - {fileID: 8617747200121638366}
   - {fileID: 8204117041126506435}
-  - {fileID: 5078674579982896706}
   - {fileID: 8524003144189432149}
+  - {fileID: 5078674579982896706}
   - {fileID: 8357778611403943796}
   m_Father: {fileID: 2755052143929226168}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 1289785741170254932}
   - component: {fileID: 2390344212158312706}
   m_Layer: 5
-  m_Name: Normal Mode
+  m_Name: Melee Mode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -817,7 +817,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SWORD
+  m_text: DEVIL
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -2028,7 +2028,7 @@ GameObject:
   - component: {fileID: 7118227969246959962}
   - component: {fileID: 5433069027620674562}
   m_Layer: 5
-  m_Name: Sword Mode
+  m_Name: Devil Mode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2337,7 +2337,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: MELEE
+  m_text: Sword
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -2707,7 +2707,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: NORMAL
+  m_text: Melee
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -2866,7 +2866,7 @@ GameObject:
   - component: {fileID: 8859606380669788386}
   - component: {fileID: 3384515314812088670}
   m_Layer: 5
-  m_Name: Melle Mode
+  m_Name: Sword Mode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

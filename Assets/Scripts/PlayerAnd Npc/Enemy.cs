@@ -5,27 +5,38 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviourPunCallbacks
 {
-    NavMeshAgent _agent;
+    public NavMeshAgent _agent;
     PlayerMovement _player;
     Transform _target;
-    Vector3 _startPos;
-    [SerializeField] int _range = 5, _currentHealth, _maxHealth = 100, _attackDamage = 10;
+    public Vector3 _startPos;
+    [SerializeField] int _range, _maxHealth, _attackDamage, _healthRegernation, _expIncrement;
+    [SerializeField] float _damageFactor, _currentHealth;
     public Image _healthbar;
     Animator _animator;
+    public float _stoppingDistance = 1.5f;
     bool _canHit = true;
     int _hitCounter = 0;
 
     void Start()
     {
+        transform.position = _startPos;
         _currentHealth = _maxHealth;
-        _startPos = transform.position;
+        UpdateHealth(_currentHealth);
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
+        _animator.SetBool("Death", false);
+        _agent.stoppingDistance = _stoppingDistance;
+
     }
 
     void Update()
     {
-        _healthbar.fillAmount = _currentHealth / 100f;
+        _healthbar.fillAmount = _currentHealth / _maxHealth;
+        if (_currentHealth < _maxHealth && _currentHealth > 0)
+        {
+            _currentHealth += _healthRegernation * Time.deltaTime;
+            UpdateHealth(_currentHealth);
+        }
         if (_currentHealth > 50)
         {
             _healthbar.color = Color.green;
@@ -97,10 +108,17 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void AfterDeath()
     {
-        if (photonView.IsMine)
-        {
-            PhotonNetwork.Destroy(gameObject);
-        }
+        UpdateHealth(_maxHealth);
+        FindAnyObjectByType<UiManager>()._totalExp += _expIncrement;
+        FindAnyObjectByType<UiManager>().RespawnEnemies(photonView.ViewID);
+        ObjectTurnOff(photonView.ViewID);
+    }
+
+    [PunRPC]
+    void ObjectTurnOff(int viewId)
+    {
+        PhotonView _pv = PhotonView.Find(viewId);
+        _pv.gameObject.SetActive(false);
     }
 
     private void FixedUpdate()
@@ -140,7 +158,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     {
         if (_currentHealth > 0)
         {
-            _currentHealth -= damage;
+            _currentHealth -= damage;// * _damageFactor;
             photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
             _animator.SetBool("GotHit", true);
         }
@@ -152,9 +170,9 @@ public class Enemy : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    void UpdateHealth(int newHealth)
+    void UpdateHealth(float newHealth)
     {
-        _currentHealth = newHealth;
+            _currentHealth = newHealth;
     }
 
     void faceTarget(Vector3 _lookAt)
