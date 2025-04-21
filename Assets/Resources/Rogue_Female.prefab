@@ -2763,6 +2763,7 @@ MonoBehaviour:
   _swordSound: {fileID: 8300000, guid: cad5a75bb9d4e1344b7049dc8bbd27ed, type: 3}
   _dashSound: {fileID: 8300000, guid: 72ff16121d595e54d99c004614c41456, type: 3}
   _swimSound: {fileID: 8300000, guid: e5f022761c09f48458394bdac0dd2e61, type: 3}
+  _gainExp: {fileID: 8300000, guid: d20ef5491bb58e84d98bac438d2125b2, type: 3}
   _followCamera: {fileID: 1400711800703588215}
   _audioSource: {fileID: 7100467973911976674}
   _ground:
@@ -2782,8 +2783,9 @@ MonoBehaviour:
   _attackAdd: 10
   _energyRegain: 5
   _energyDeduction: 15
-  _exp: 0
-  _level: 0
+  _exp: 100
+  _level: 1
+  _expRequired: 0
   _currentHealth: 0
   _defence: 0
   _currentEnergy: 0
@@ -2829,7 +2831,7 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 0
   m_UseGravity: 1
   m_IsKinematic: 0

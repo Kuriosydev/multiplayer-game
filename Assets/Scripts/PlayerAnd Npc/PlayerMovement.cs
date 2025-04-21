@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] GameObject _leftHand, _rightHand, _dashEffect, _knife1, _knife2, _spawnLocation, _devilFruit1, _devilFruit2;
     public Image _healthbar;
     [SerializeField] TMP_Text _playerName;
-    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound;
+    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound, _gainExp;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
     public AudioSource _audioSource;
@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public int _maxHealth = 100, _maxEnergy = 100, _runForce = 6000,
         _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
         _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
-        _energyRegain = 5, _energyDeduction = 15, _exp, _level;
+        _energyRegain = 5, _energyDeduction = 15, _exp = 100, _level = 1, _expRequired;
     public float _currentHealth, _defence, _currentEnergy;
     float _speed = 15f, _rotationValue = 6f;
     float _defenceAdd;
@@ -32,10 +32,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        _exp = PlayerPrefs.GetInt("Exp");
         _maxHealth = _maxHealth + (_level * _healthAdd);
         _damage = _damage + (_level * _attackAdd);
         _maxEnergy = _maxHealth;
+        _expRequired = 2 * _exp;
         _defence = _maxHealth / 2;
         _currentHealth = _maxHealth;
         _currentEnergy = _maxEnergy;
@@ -65,10 +65,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void LevelUp()
     {
-        _exp = PlayerPrefs.GetInt("Exp");
-        if (_exp % 50 == 0)
+        if (_exp >= _expRequired)
         {
-            _level = (int)(_exp / 100);
+            _level += 1;
+            _expRequired = 2 * _expRequired;
         }
         _maxHealth = 100 + (_level * _healthAdd);
         _damage = 10 + (_level * _attackAdd);
@@ -78,7 +78,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void ExpIncrease(int _value)
     {
-        PlayerPrefs.SetInt("Exp", PlayerPrefs.GetInt("Exp") + _value);
+        if (photonView.IsMine)
+        {
+            _exp += _value;
+            LevelUp();
+            _soundPlaying = true;
+            _audioSource.PlayOneShot(_gainExp);
+            //ExpIncrease(_exp);
+        }
     }
 
     void Update()
@@ -89,7 +96,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _currentHealth += _healthRegain * Time.deltaTime;
             UpdateHealth(_currentHealth);
         }
-        if(_currentEnergy < _maxEnergy)
+        if (_currentEnergy < _maxEnergy)
         {
             _currentEnergy += _energyRegain * Time.deltaTime;
         }
@@ -103,7 +110,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         if (photonView.IsMine)
         {
-            LevelUp();
             if (!_animator.GetBool("JumpCheck") && _animator.GetInteger("Jump") > 0)
             {
                 GroundCheck();
@@ -134,8 +140,22 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
-            FindFirstObjectByType<UiManager>()._reSpawn = 1;
-            PhotonNetwork.Destroy(gameObject);
+            //FindFirstObjectByType<UiManager>()._reSpawn = 1;
+            _animator.SetBool("Death", false);
+            transform.position = FindFirstObjectByType<UiManager>()._playerPosition[Random.Range(0, FindFirstObjectByType<UiManager>()._playerPosition.Length - 1)];
+            _followCamera.gameObject.SetActive(false);
+            ReplaceAfterDeath();
+        }
+    }
+
+    public void ReplaceAfterDeath()
+    {
+        if (photonView.IsMine)
+        {
+            _currentHealth = _maxHealth;
+            _currentEnergy = _maxEnergy;
+            UpdateHealth(_currentHealth);
+            _followCamera.gameObject.SetActive(true);
         }
     }
 
@@ -355,14 +375,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
-    //public void ExpIncrease(int _amount)
-    //{
-    //    if (photonView.IsMine)
-    //    {
-    //         PlayerPrefs.SetInt("Exp", PlayerPrefs.GetInt("Exp") + _amount);
-    //    }
-    //}
-
     void StrikeCounterUp(int value)
     {
         _animator.SetInteger("StrikeNumber", value);
@@ -422,7 +434,15 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
-    //Different Land/Water switch;
+    void ExpUpdate(int expUpdate)
+    {
+        if (photonView.IsMine)
+        {
+            _exp = expUpdate;
+        }
+    }
+
+    //Land/Water switch;
     public void WaterSwitch()
     {
         _animator.SetBool("InWater", false);
@@ -433,22 +453,6 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         _animator.SetBool("InWater", true);
         _animator.SetInteger("Swim", 1);
-    }
-
-    public void RunAndWalkSwitch()
-    {
-        if (_run)
-        {
-            _run = false;
-            _speed = 12f;
-            _animator.SetBool("Run", false);
-        }
-        else
-        {
-            _run = true;
-            _speed = 15f;
-            _animator.SetBool("Walk", false);
-        }
     }
 
     //Camera and Joystick Section;
@@ -633,17 +637,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     //HealthBarRotation  UnderProgress
     void HealthBarRotation()
     {
-        //Vector3 _dir = (transform.position - _bar.transform.position).normalized;
-        //Quaternion lookRotation = Quaternion.LookRotation(new Vector3(_bar.transform.position.x, _dir.y, _dir.z));
-        //_healthbar.transform.rotation = Quaternion.Slerp(_bar.transform.rotation, lookRotation, 8f * Time.deltaTime);
-        Transform _camerapostion = transform;
         if (photonView.IsMine)
         {
+            Transform _camerapostion = transform;
             _camerapostion = _followCamera.transform;
-        }
-        foreach (GameObject _bar in GameObject.FindGameObjectsWithTag("HealthBar"))
-        {
-            _bar.transform.rotation = _camerapostion.transform.rotation;
+            foreach (GameObject _bar in GameObject.FindGameObjectsWithTag("HealthBar"))
+            {
+                _bar.transform.rotation = _camerapostion.transform.rotation;
+            }
         }
     }
 

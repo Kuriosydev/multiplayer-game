@@ -16,10 +16,10 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        if (!PlayerPrefs.HasKey("Tutorial"))
-        {
-            SceneManager.LoadScene(2);
-        }
+        //if (!PlayerPrefs.HasKey("Tutorial"))
+        //{
+        //    SceneManager.LoadScene(2);
+        //}
     }
 
     private void Start()

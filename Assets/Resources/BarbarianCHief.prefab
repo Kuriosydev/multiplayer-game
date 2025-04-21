@@ -1186,7 +1186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _agent: {fileID: 0}
   _startPos: {x: 0, y: 0, z: 0}
-  _range: 15
+  _range: 30
   _maxHealth: 300
   _attackDamage: 35
   _healthRegernation: 7

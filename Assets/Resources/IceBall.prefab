@@ -19528,5 +19528,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c0ea17bb3b2734d8a7e7e225917f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 0}
-  photonView: {fileID: -4476567109748321571}

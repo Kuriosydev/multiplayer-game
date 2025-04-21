@@ -10,7 +10,6 @@ public class Enemy : MonoBehaviourPunCallbacks
     Transform _target;
     public Vector3 _startPos;
     [SerializeField] int _range, _maxHealth, _attackDamage, _healthRegernation, _expIncrement;
-    GameObject _hitter;
     [SerializeField] float _damageFactor, _currentHealth;
     public Image _healthbar;
     Animator _animator;
@@ -58,46 +57,53 @@ public class Enemy : MonoBehaviourPunCallbacks
         }
         if (_currentHealth > 0)
         {
-            foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
+            if (_target != null)
             {
-                if (Vector3.Distance(transform.position, player.gameObject.transform.position) <= _range)
+                if (_target.gameObject.GetComponent<PlayerMovement>()._currentHealth > 0)
                 {
-                    if (_target != null)
+                    _agent.SetDestination(_target.position);
+                    if (Vector3.Distance(transform.position, _target.position) <= _agent.stoppingDistance)
                     {
-                        if (Vector3.Distance(transform.position, player.gameObject.transform.position) < Vector3.Distance(transform.position, _target.position))
-                        {
-                            _target = player.gameObject.transform;
-                        }
+                        _agent.velocity = Vector3.zero;
+                        _animator.SetBool("Run", false);
+                        _animator.SetBool("Attack", true);
+                        Attack();
                     }
                     else
                     {
-                        _target = player.gameObject.transform;
+                        _animator.SetBool("Run", true);
+                        _animator.SetBool("Attack", false);
                     }
-                }
-            }
-            if (_target != null)
-            {
-                _agent.SetDestination(_target.position);
-                if (Vector3.Distance(transform.position, _target.position) <= _agent.stoppingDistance)
-                {
-                    _agent.velocity = Vector3.zero;
-                    _animator.SetBool("Run", false);
-                    _animator.SetBool("Attack", true);
-                    Attack();
                 }
                 else
                 {
-                    _animator.SetBool("Run", true);
-                    _animator.SetBool("Attack", false);
-                }
-                if (Vector3.Distance(transform.position, _target.position) > _range)
-                {
                     _target = null;
-                    _animator.SetBool("Attack", false);
                 }
+                //if (Vector3.Distance(transform.position, _target.position) > _range)
+                //{
+                //    _target = null;
+                //    _animator.SetBool("Attack", false);
+                //}
             }
             else
             {
+                //foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
+                //{
+                //    if (Vector3.Distance(transform.position, player.gameObject.transform.position) <= _range)
+                //    {
+                //        if (_target != null)
+                //        {
+                //            if (Vector3.Distance(transform.position, player.gameObject.transform.position) < Vector3.Distance(transform.position, _target.position))
+                //            {
+                //                _target = player.gameObject.transform;
+                //            }
+                //        }
+                //        else
+                //        {
+                //            _target = player.gameObject.transform;
+                //        }
+                //    }
+                //}
                 _agent.SetDestination(_startPos);
                 if (Vector3.Distance(transform.position, _startPos) <= _agent.stoppingDistance)
                 {
@@ -118,11 +124,19 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void AfterDeath()
     {
-        UpdateHealth(_maxHealth);
-        //FindAnyObjectByType<UiManager>()._localPlayer.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
-        if (_hitter.CompareTag("Player"))
+        if (photonView.IsMine)
         {
-            _hitter.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+            UpdateHealth(_maxHealth);
+            //FindAnyObjectByType<UiManager>()._localPlayer.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+            if (_target != null)
+            {
+                if (_target.CompareTag("Player"))
+                {
+                    _target.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+                    ObjectTurnOff(photonView.ViewID);
+                    _target = null;
+                }
+            }
         }
         FindAnyObjectByType<UiManager>().RespawnEnemies(photonView.ViewID);
         ObjectTurnOff(photonView.ViewID);
@@ -172,7 +186,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     {
         if (_currentHealth > 0)
         {
-            _hitter = _theplayer;
+            _target = _theplayer.transform;
             _currentHealth -= damage;// * _damageFactor;
             photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
             _animator.SetBool("GotHit", true);

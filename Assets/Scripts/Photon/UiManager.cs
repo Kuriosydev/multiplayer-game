@@ -1,7 +1,6 @@
 using Photon.Pun;
 using Photon.Realtime;
 using Photon.Voice.Unity;
-using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -9,20 +8,19 @@ using UnityEngine.UI;
 
 public class UiManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField]
-    Vector3[] _playerPosition, _guardPositions, _chiefPosition, _traineePosition;
-    [SerializeField] Image _healthBar, _energyBar;
-    [SerializeField] Button _jump, _dash, _mic, _meleeMode, _swordMode , _devilMode;
+    public Vector3[] _playerPosition, _guardPositions, _chiefPosition, _traineePosition;
+    [SerializeField] Image _healthBar, _energyBar, _expBar;
+    [SerializeField] Sprite _buttonSelected, _buttonUnSelected;
+    [SerializeField] Button _jump, _dash, _mic, _meleeMode, _swordMode, _devilMode;
     [SerializeField] GameObject _player, _guard, _chief, _trainee, _dummyBoss;
     public PlayerMovement _localPlayer;
-    public int _reSpawn = 1, _level = 0, _totalExp = 100, _devilFruit = 0;
+    public int _reSpawn = 1, _devilFruit = 0;
     [SerializeField] Recorder _recorder;
     [SerializeField] TMP_Text _text, _levelText;
     [SerializeField] Slider _slider;
 
     private void Start()
     {
-        _totalExp = 100;
         _devilFruit = 1;
         _slider.onValueChanged.AddListener(SliderValueChanged);
         _jump.onClick.AddListener(JumpClicked);
@@ -33,7 +31,7 @@ public class UiManager : MonoBehaviourPunCallbacks
         _mic.onClick.AddListener(MicOnOff);
         if (PhotonNetwork.IsMasterClient)
         {
-            foreach (Vector3 _pos in _guardPositions) 
+            foreach (Vector3 _pos in _guardPositions)
             {
                 GameObject _newGuard = PhotonNetwork.InstantiateRoomObject(_guard.name, _pos, Quaternion.identity);
                 _newGuard.GetComponent<Enemy>()._startPos = _pos;
@@ -58,13 +56,13 @@ public class UiManager : MonoBehaviourPunCallbacks
         if (!FindAnyObjectByType<PlayerMovement>() || !FindAnyObjectByType<PlayerMovement>().photonView.IsMine && _reSpawn > 0)
         {
             _reSpawn = 0;
-            PhotonNetwork.Instantiate(_player.name, _playerPosition[Random.Range(0,_playerPosition.Length -1)], Quaternion.identity);
+            PhotonNetwork.Instantiate(_player.name, _playerPosition[Random.Range(0, _playerPosition.Length - 1)], Quaternion.identity);
             foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
             {
                 if (player.photonView.IsMine)
                 {
                     _localPlayer = player;
-                    if(PhotonNetwork.LocalPlayer.NickName == "")
+                    if (PhotonNetwork.LocalPlayer.NickName == "")
                     {
                         PhotonNetwork.LocalPlayer.NickName = "Player" + PhotonNetwork.LocalPlayer.ActorNumber.ToString();
                     }
@@ -73,29 +71,17 @@ public class UiManager : MonoBehaviourPunCallbacks
         }
         if (PhotonNetwork.MasterClient.IsInactive)
         {
-            //foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
-            //{
-            //    // Optionally reinitialize anything if needed
-            //    enemy.enabled = false;
-            //}
             if (!PhotonNetwork.LocalPlayer.IsMasterClient)
             {
                 PhotonNetwork.SetMasterClient(PhotonNetwork.LocalPlayer);
-            }
-        }
-        else
-        {
-            foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
-            {
-                // Optionally reinitialize anything if needed
-                enemy.enabled = true;
             }
         }
         if (_localPlayer != null)
         {
             _energyBar.fillAmount = _localPlayer._currentEnergy / _localPlayer._maxEnergy;
             _healthBar.fillAmount = _localPlayer._currentHealth / _localPlayer._maxHealth;
-            if(_devilFruit > 0)
+            _expBar.fillAmount = (float)_localPlayer.GetComponent<PlayerMovement>()._exp / (float)_localPlayer.GetComponent<PlayerMovement>()._expRequired;
+            if (_devilFruit > 0)
             {
                 _devilMode.gameObject.SetActive(true);
             }
@@ -121,24 +107,55 @@ public class UiManager : MonoBehaviourPunCallbacks
         _localPlayer.DashForward();
     }
 
-    void NormalMode()
-    {
-        _localPlayer.DevilFruitMode();
-    }
-
     void MeleeMode()
     {
         _localPlayer.MeleeMode();
+        if (_meleeMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+        {
+            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        }
+        else
+        {
+            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        }
     }
 
     void SwordMode()
     {
         _localPlayer.SwordMode();
+        if (_swordMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+        {
+            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        }
+        else
+        {
+            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        }
     }
 
     void DevilMode()
     {
         _localPlayer.DevilFruitMode();
+        if (_devilMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+        {
+            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+        }
+        else
+        {
+            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        }
     }
 
     void JumpClicked()
@@ -171,17 +188,6 @@ public class UiManager : MonoBehaviourPunCallbacks
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
         Debug.Log("Master Client switched to: " + newMasterClient.NickName);
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // Find all NPCs and enable their logic again
-            //foreach (Enemy enemy in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
-            //{
-            //    // Optionally reinitialize anything if needed
-            //    enemy.enabled = false;
-            //    enemy.enabled = true; // make sure script is active
-            //}
-        }
     }
 
 }
