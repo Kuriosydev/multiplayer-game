@@ -10,6 +10,9 @@ TagManager:
   - Quiz
   - Enemy
   - HealthBar
+  - Wall
+  - Powerup
+  - Quest
   layers:
   - Default
   - TransparentFX

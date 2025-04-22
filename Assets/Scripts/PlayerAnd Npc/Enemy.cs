@@ -79,31 +79,31 @@ public class Enemy : MonoBehaviourPunCallbacks
                 {
                     _target = null;
                 }
-                //if (Vector3.Distance(transform.position, _target.position) > _range)
-                //{
-                //    _target = null;
-                //    _animator.SetBool("Attack", false);
-                //}
+                if (Vector3.Distance(transform.position, _target.position) > _range && _currentHealth >= _maxHealth)
+                {
+                    _target = null;
+                    _animator.SetBool("Attack", false);
+                }
             }
             else
             {
-                //foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
-                //{
-                //    if (Vector3.Distance(transform.position, player.gameObject.transform.position) <= _range)
-                //    {
-                //        if (_target != null)
-                //        {
-                //            if (Vector3.Distance(transform.position, player.gameObject.transform.position) < Vector3.Distance(transform.position, _target.position))
-                //            {
-                //                _target = player.gameObject.transform;
-                //            }
-                //        }
-                //        else
-                //        {
-                //            _target = player.gameObject.transform;
-                //        }
-                //    }
-                //}
+                foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
+                {
+                    if (Vector3.Distance(transform.position, player.gameObject.transform.position) <= _range)
+                    {
+                        if (_target != null)
+                        {
+                            if (Vector3.Distance(transform.position, player.gameObject.transform.position) < Vector3.Distance(transform.position, _target.position))
+                            {
+                                _target = player.gameObject.transform;
+                            }
+                        }
+                        else
+                        {
+                            _target = player.gameObject.transform;
+                        }
+                    }
+                }
                 _agent.SetDestination(_startPos);
                 if (Vector3.Distance(transform.position, _startPos) <= _agent.stoppingDistance)
                 {
@@ -186,6 +186,7 @@ public class Enemy : MonoBehaviourPunCallbacks
     {
         if (_currentHealth > 0)
         {
+            //_agent.velocity = Vector3.zero;
             _target = _theplayer.transform;
             _currentHealth -= damage;// * _damageFactor;
             photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);

@@ -22,12 +22,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
         _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
         _energyRegain = 5, _energyDeduction = 15, _exp = 100, _level = 1, _expRequired;
-    public float _currentHealth, _defence, _currentEnergy;
+    public float _currentHealth, _defence, _currentEnergy , _timer;
     float _speed = 15f, _rotationValue = 6f;
     float _defenceAdd;
     Vector3 _inputDir;
     RaycastHit _hit;
-    int _state = 0, _hitCounter = 0, _jumpCount = 0;
+    int _hitCounter = 0, _jumpCount = 0;
+    public int _state = 0, _devilFruit = 0, _money;
     bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying = false, _canDash = true;
 
     private void Awake()
@@ -83,6 +84,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _exp += _value;
             LevelUp();
             _soundPlaying = true;
+            _audioSource.Stop();
             _audioSource.PlayOneShot(_gainExp);
             //ExpIncrease(_exp);
         }
@@ -90,6 +92,19 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     void Update()
     {
+        if (_state == 3)
+        {
+            if (_timer > 0)
+            {
+                _timer -= 1 * Time.deltaTime;
+            }
+            else
+            {
+                _timer = 0;
+                _devilFruit = 0;
+                NormalsMode();
+            }
+        }
         _healthbar.fillAmount = _currentHealth / _maxHealth;
         if (_currentHealth < _maxHealth && _currentHealth > 0)
         {
@@ -257,7 +272,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 _hitCounter = 0;
                 _animator.SetInteger("StrikeNumber", _hitCounter);
                 _combatMode = true;
-                if (FindFirstObjectByType<UiManager>()._devilFruit == 3)
+                if (_devilFruit == 3)
                 {
                     transform.localScale = new Vector3(3, 3, 3);
                     _orientation.localPosition = new Vector3(0, 0.1f, 0);
@@ -289,7 +304,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             if (_attack)
             {
-                if (_state != 3 || FindAnyObjectByType<UiManager>()._devilFruit == 3)
+                if (_state != 3 || _devilFruit == 3)
                 {
                     other.gameObject.GetComponent<PlayerMovement>().TakeDamage(_damage);
                 }
@@ -298,7 +313,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         if (other.gameObject.CompareTag("Enemy"))
         {
-            if (FindAnyObjectByType<UiManager>()._devilFruit == 3)
+            if (_devilFruit == 3)
             {
                 if (other.gameObject.transform.localScale.y < 3)
                 {
@@ -307,7 +322,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
             if (_attack)
             {
-                if (_state != 3 || FindAnyObjectByType<UiManager>()._devilFruit == 3)
+                if (_state != 3 || _devilFruit == 3)
                 {
                     if (other.gameObject.GetComponent<Enemy>())
                     {
@@ -397,7 +412,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
             if (_state == 3)
             {
-                FruitPower(FindAnyObjectByType<UiManager>()._devilFruit);
+                FruitPower(_devilFruit);
             }
         }
     }

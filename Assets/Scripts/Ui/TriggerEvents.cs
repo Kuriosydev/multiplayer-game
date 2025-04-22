@@ -39,7 +39,19 @@ public class TriggerEvents : MonoBehaviour
     {
         if (other.CompareTag("Chest"))
         {
-          _quizPanelHandler = Instantiate(_quizPanel);
+            _quizPanelHandler = Instantiate(_quizPanel);
+        }
+        else if (other.CompareTag("Wall"))
+        {
+            _quizPanelHandler = Instantiate(_quizPanel);
+            _quizPanelHandler.GetComponent<QuizManagerJson>()._questionsCount = 2;
+            _quizPanelHandler.GetComponent<QuizManagerJson>()._totalQuestion.SetActive(false);
+            _quizPanelHandler.GetComponent<QuizManagerJson>()._wall = other.gameObject;
+        }
+        else if (other.CompareTag("Powerup"))
+        {
+            _quizPanelHandler = Instantiate(_quizPanel);
+            _quizPanelHandler.GetComponent<QuizManagerJson>()._powerUp = int.Parse(other.gameObject.name);
         }
     }
 }

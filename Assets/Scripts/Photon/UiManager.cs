@@ -8,20 +8,20 @@ using UnityEngine.UI;
 
 public class UiManager : MonoBehaviourPunCallbacks
 {
+    [SerializeField] TMP_Text _healthText, _energyText, _expText , _levelText;
+    [SerializeField] Sprite _micOn, _micOff;
     public Vector3[] _playerPosition, _guardPositions, _chiefPosition, _traineePosition;
     [SerializeField] Image _healthBar, _energyBar, _expBar;
     [SerializeField] Sprite _buttonSelected, _buttonUnSelected;
     [SerializeField] Button _jump, _dash, _mic, _meleeMode, _swordMode, _devilMode;
     [SerializeField] GameObject _player, _guard, _chief, _trainee, _dummyBoss;
     public PlayerMovement _localPlayer;
-    public int _reSpawn = 1, _devilFruit = 0;
+    public int _reSpawn = 1;
     [SerializeField] Recorder _recorder;
-    [SerializeField] TMP_Text _text, _levelText;
     [SerializeField] Slider _slider;
 
     private void Start()
     {
-        _devilFruit = 1;
         _slider.onValueChanged.AddListener(SliderValueChanged);
         _jump.onClick.AddListener(JumpClicked);
         _meleeMode.onClick.AddListener(MeleeMode);
@@ -79,11 +79,52 @@ public class UiManager : MonoBehaviourPunCallbacks
         if (_localPlayer != null)
         {
             _energyBar.fillAmount = _localPlayer._currentEnergy / _localPlayer._maxEnergy;
+            _energyText.text = ((int)_localPlayer._currentEnergy).ToString() + "/" + _localPlayer._maxEnergy.ToString();
             _healthBar.fillAmount = _localPlayer._currentHealth / _localPlayer._maxHealth;
+            _healthText.text = ((int)_localPlayer._currentHealth).ToString() + "/" + _localPlayer._maxHealth.ToString();
             _expBar.fillAmount = (float)_localPlayer.GetComponent<PlayerMovement>()._exp / (float)_localPlayer.GetComponent<PlayerMovement>()._expRequired;
-            if (_devilFruit > 0)
+            _expText.text = _localPlayer.GetComponent<PlayerMovement>()._exp.ToString() + "/" + _localPlayer.GetComponent<PlayerMovement>()._expRequired.ToString();
+            _devilMode.image.fillAmount = _localPlayer.GetComponent<PlayerMovement>()._timer / 120f;
+            if(_localPlayer.GetComponent<PlayerMovement>()._timer <= 0)
+            {
+                _devilMode.gameObject.SetActive(false);
+            }
+            if (_localPlayer.GetComponent<PlayerMovement>()._devilFruit > 0)
             {
                 _devilMode.gameObject.SetActive(true);
+            }
+            if(_localPlayer.GetComponent<PlayerMovement>()._state == 1)
+            {
+                if (_meleeMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+                {
+                    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+                    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                }
+            }
+            else if (_localPlayer.GetComponent<PlayerMovement>()._state == 2)
+            {
+                if (_swordMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+                {
+                    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+                    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                }
+            }
+            else if (_localPlayer.GetComponent<PlayerMovement>()._state == 3)
+            {
+                if (_devilMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+                {
+                    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+                }
+            }
+            else
+            {
+                _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+                _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
             }
             _levelText.text = "Level " + _localPlayer._level.ToString();
         }
@@ -107,55 +148,55 @@ public class UiManager : MonoBehaviourPunCallbacks
         _localPlayer.DashForward();
     }
 
+    public async void WallReappear(GameObject _wall)
+    {
+        await Task.Delay(10000);
+        _wall.gameObject.SetActive(true);
+    }
+
     void MeleeMode()
     {
         _localPlayer.MeleeMode();
-        if (_meleeMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
-        {
-            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
-            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        }
-        else
-        {
-            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        }
+        //else
+        //{
+        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //}
     }
 
     void SwordMode()
     {
         _localPlayer.SwordMode();
-        if (_swordMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
-        {
-            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
-            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        }
-        else
-        {
-            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        }
+        //if (_swordMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+        //{
+        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //}
+        //else
+        //{
+        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //}
     }
 
     void DevilMode()
     {
         _localPlayer.DevilFruitMode();
-        if (_devilMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
-        {
-            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
-        }
-        else
-        {
-            _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-            _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        }
+        //if (_devilMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
+        //{
+        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
+        //}
+        //else
+        //{
+        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
+        //}
     }
 
     void JumpClicked()
@@ -168,12 +209,12 @@ public class UiManager : MonoBehaviourPunCallbacks
         if (_recorder.TransmitEnabled)
         {
             _recorder.TransmitEnabled = false;
-            _text.text = "Mic Off";
+            _mic.image.sprite = _micOff;
         }
         else
         {
             _recorder.TransmitEnabled = true;
-            _text.text = "Mic On";
+            _mic.image.sprite = _micOn;
         }
     }
 

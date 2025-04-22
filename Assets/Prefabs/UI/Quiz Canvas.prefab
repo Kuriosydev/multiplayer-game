@@ -431,6 +431,8 @@ GameObject:
   - component: {fileID: 3818382326370888361}
   - component: {fileID: 4847846248655309246}
   - component: {fileID: 3465841760004190783}
+  - component: {fileID: 809937548662984508}
+  - component: {fileID: 3652712293889559820}
   m_Layer: 5
   m_Name: Quiz Canvas
   m_TagString: Quiz
@@ -521,6 +523,136 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &809937548662984508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946826381382596423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 219164324f84e8847be3d88af7373b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _correctAnswer: {fileID: 8300000, guid: f79179109a6159048acef8f7102e8875, type: 3}
+  _wrongAnswer: {fileID: 8300000, guid: 76eea4e769b5f42499990a3fdd7a41be, type: 3}
+  _arenaUnlock: {fileID: 8300000, guid: 597ab907968c67e449dcff203880ba1d, type: 3}
+  _wall: {fileID: 0}
+  _questionsCount: 0
+  questionText: {fileID: 4878690888803626573}
+  scoreText: {fileID: 580439356713875002}
+  optionButtons:
+  - {fileID: 3979751997994369426}
+  - {fileID: 1604455008503971038}
+  - {fileID: 1214654701419335142}
+  - {fileID: 5218486880000772434}
+  _questionsNo:
+  - {fileID: 3378531104453985125}
+  - {fileID: 8425521648986348632}
+  - {fileID: 3907680018272422056}
+  _checkImages:
+  - {fileID: 21300000, guid: 9b2f9f7e983085f4d9117eab12d9139d, type: 3}
+  - {fileID: 21300000, guid: d23e31107e694224d85ac835757a01d5, type: 3}
+  _quizPanel: {fileID: 946826381382596423}
+  _totalQuestion: {fileID: 4533751538479076851}
+--- !u!82 &3652712293889559820
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946826381382596423}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 0.3
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1248686413460025855
 GameObject:
   m_ObjectHideFlags: 0
@@ -828,7 +960,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -1149,7 +1281,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -1190,7 +1322,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8503813069565723820
 Transform:
   m_ObjectHideFlags: 0
@@ -1218,6 +1350,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 219164324f84e8847be3d88af7373b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _correctAnswer: {fileID: 0}
+  _wrongAnswer: {fileID: 0}
+  _arenaUnlock: {fileID: 0}
+  _wall: {fileID: 0}
+  _questionsCount: 0
   questionText: {fileID: 4878690888803626573}
   scoreText: {fileID: 580439356713875002}
   optionButtons:
@@ -1233,6 +1370,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9b2f9f7e983085f4d9117eab12d9139d, type: 3}
   - {fileID: 21300000, guid: d23e31107e694224d85ac835757a01d5, type: 3}
   _quizPanel: {fileID: 946826381382596423}
+  _totalQuestion: {fileID: 4533751538479076851}
 --- !u!1 &3741415485350871285
 GameObject:
   m_ObjectHideFlags: 0
@@ -1530,7 +1668,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -2305,7 +2443,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}

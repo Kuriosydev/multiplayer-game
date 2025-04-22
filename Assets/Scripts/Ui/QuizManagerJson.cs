@@ -22,11 +22,15 @@ public class QuizManagerJson : MonoBehaviour
         public List<Question> questions;
     }
 
+    [SerializeField] AudioClip _correctAnswer, _wrongAnswer, _arenaUnlock;
+    AudioSource _audiosource;
+    public GameObject _wall;
+    private bool _isAnswered = false;
     private List<Question> questions;
     private int currentQuestionIndex = 0;
     private int score = 0;
-    private int _questionsCount = 0;
-
+    public int _questionsCount = 0;
+    public int _powerUp = 0;
     public TMP_Text questionText;
     public TMP_Text scoreText;
     public Button[] optionButtons;
@@ -43,10 +47,11 @@ public class QuizManagerJson : MonoBehaviour
 
     Color newColor;
 
-    [SerializeField]
-    GameObject _quizPanel;
+    public
+    GameObject _quizPanel, _totalQuestion;
     void Start()
     {
+        _audiosource = GetComponent<AudioSource>();
         StartCoroutine(LoadQuestions());
         //DisplayQuestion();
     }
@@ -96,6 +101,7 @@ public class QuizManagerJson : MonoBehaviour
 
     void DisplayQuestion()
     {
+        _isAnswered = false;
         currentQuestionIndex = Random.Range(0, questions.Count - 1);
         //if (currentQuestionIndex < questions.Count)
         if (_questionsCount < 3)
@@ -129,28 +135,41 @@ public class QuizManagerJson : MonoBehaviour
 
     void OnAnswerSelected(int index)
     {
-        if (index == questions[currentQuestionIndex].correctAnswerIndex)
+        if (!_isAnswered)
         {
-            score++;
-            ChangeButtonColor(hexCorrectColor);
-            optionButtons[index].transform.GetComponent<Image>().color = newColor;
-
-            _questionsNo[_questionsCount].sprite = _checkImages[0];
+            if (index == questions[currentQuestionIndex].correctAnswerIndex)
+            {
+                score++;
+                ChangeButtonColor(hexCorrectColor);
+                optionButtons[index].transform.GetComponent<Image>().color = newColor;
+                _questionsNo[_questionsCount].sprite = _checkImages[0];
+                //if (_wall != null)
+                //{
+                //    _audiosource.PlayOneShot(_arenaUnlock);
+                //}
+                //else
+                //{
+                //    _audiosource.PlayOneShot(_correctAnswer);
+                //}
+                _audiosource.PlayOneShot(_arenaUnlock);
+                Invoke("WallsDestroy", 1f);
+            }
+            else
+            {
+                _audiosource.PlayOneShot(_wrongAnswer);
+                ChangeButtonColor(hexWrongColor);
+                optionButtons[index].transform.GetComponent<Image>().color = newColor;
+                _questionsNo[_questionsCount].sprite = _checkImages[1];
+            }
+            _isAnswered = true;
+            StartCoroutine(NextQuestion());
         }
-        else
-        {
-            ChangeButtonColor(hexWrongColor);
-            optionButtons[index].transform.GetComponent<Image>().color = newColor;
-            _questionsNo[_questionsCount].sprite = _checkImages[1];
-        }
-
-        StartCoroutine(NextQuestion());
     }
 
     IEnumerator NextQuestion()
     {
         questions.RemoveAt(currentQuestionIndex);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.2f);
         _questionsCount++;
         DisplayQuestion();
     }
@@ -170,8 +189,29 @@ public class QuizManagerJson : MonoBehaviour
         }
     }
 
+    void WallsDestroy()
+    {
+        if (_wall != null)
+        {
+            _wall.SetActive(false);
+            FindFirstObjectByType<UiManager>().WallReappear(_wall);
+        }
+    }
+
     public void Close()
     {
+        if(_powerUp > 0 && score == 3)
+        {
+            foreach(TriggerEvents i in FindObjectsByType<TriggerEvents>(FindObjectsSortMode.None))
+            {
+                if (i.isActiveAndEnabled)
+                {
+                    i.gameObject.GetComponent<PlayerMovement>()._devilFruit = _powerUp;
+                    i.gameObject.GetComponent<PlayerMovement>()._timer = 120f;
+                    i.gameObject.GetComponent<PlayerMovement>().NormalsMode();
+                }
+            }
+        }
         Destroy(_quizPanel);
     }
 }
