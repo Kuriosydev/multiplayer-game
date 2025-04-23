@@ -23,6 +23,7 @@ public class QuizManagerJson : MonoBehaviour
     }
 
     [SerializeField] AudioClip _correctAnswer, _wrongAnswer, _arenaUnlock;
+    public Button _buy;
     AudioSource _audiosource;
     public GameObject _wall;
     private bool _isAnswered = false;
@@ -34,7 +35,7 @@ public class QuizManagerJson : MonoBehaviour
     public TMP_Text questionText;
     public TMP_Text scoreText;
     public Button[] optionButtons;
-
+    public bool _chest = false;
     string hexCorrectColor = "#4EEE45";
     string hexWrongColor = "#FA7D78";
     string hexDefaultColor = "#70CCFF";
@@ -52,6 +53,7 @@ public class QuizManagerJson : MonoBehaviour
     void Start()
     {
         _audiosource = GetComponent<AudioSource>();
+        _buy.onClick.AddListener(Close);
         StartCoroutine(LoadQuestions());
         //DisplayQuestion();
     }
@@ -197,19 +199,37 @@ public class QuizManagerJson : MonoBehaviour
             FindFirstObjectByType<UiManager>().WallReappear(_wall);
         }
     }
-
     public void Close()
     {
-        if(_powerUp > 0 && score == 3)
+        foreach (TriggerEvents i in FindObjectsByType<TriggerEvents>(FindObjectsSortMode.None))
         {
-            foreach(TriggerEvents i in FindObjectsByType<TriggerEvents>(FindObjectsSortMode.None))
+            if (i.isActiveAndEnabled)
             {
-                if (i.isActiveAndEnabled)
+                if (_powerUp > 0 && score == 3)
                 {
                     i.gameObject.GetComponent<PlayerMovement>()._devilFruit = _powerUp;
                     i.gameObject.GetComponent<PlayerMovement>()._timer = 120f;
                     i.gameObject.GetComponent<PlayerMovement>().NormalsMode();
                 }
+                if (_chest)
+                {
+                    i.gameObject.GetComponent<PlayerMovement>()._money += score * 100;
+                }
+                try
+                {
+                    if (_buy.gameObject.activeSelf)
+                    {
+                        i.gameObject.GetComponent<PlayerMovement>()._money -= 300;
+                        i.gameObject.GetComponent<PlayerMovement>()._devilFruit = _powerUp;
+                        i.gameObject.GetComponent<PlayerMovement>()._timer = 120f;
+                        i.gameObject.GetComponent<PlayerMovement>().NormalsMode();
+                    }
+                }
+                catch
+                {
+
+                }
+                i.gameObject.GetComponent<PlayerMovement>().ScoreIncrease(score);
             }
         }
         Destroy(_quizPanel);

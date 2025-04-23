@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -7,10 +8,13 @@ using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
+    [SerializeField]
+    GameObject[] _parts;
     [SerializeField] Transform _orientation;
+    List<int> scores = new List<int>();
     [SerializeField] GameObject _leftHand, _rightHand, _dashEffect, _knife1, _knife2, _spawnLocation, _devilFruit1, _devilFruit2;
-    public Image _healthbar;
-    [SerializeField] TMP_Text _playerName;
+    public Image _healthbar, _starColor;
+    [SerializeField] TMP_Text _playerName, _playerRank;
     [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound, _gainExp;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
@@ -18,17 +22,18 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     Animator _animator;
     [SerializeField] LayerMask _ground;
     Rigidbody _rb;
+    string _numberOneRank = "FFC000", _numberTwoRank = "D8D9CD", _normalRankColor = "A0480C";
     public int _maxHealth = 100, _maxEnergy = 100, _runForce = 6000,
         _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
         _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
-        _energyRegain = 5, _energyDeduction = 15, _exp = 100, _level = 1, _expRequired;
-    public float _currentHealth, _defence, _currentEnergy , _timer;
+        _energyRegain = 5, _energyDeduction = 15, _exp = 100, _level = 1, _expRequired, _rank = 1;
+    public float _currentHealth, _defence, _currentEnergy, _timer;
     float _speed = 15f, _rotationValue = 6f;
     float _defenceAdd;
     Vector3 _inputDir;
     RaycastHit _hit;
     int _hitCounter = 0, _jumpCount = 0;
-    public int _state = 0, _devilFruit = 0, _money;
+    public int _state = 0, _devilFruit = 0, _money, _score;
     bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying = false, _canDash = true;
 
     private void Awake()
@@ -61,7 +66,36 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _followCamera.gameObject.SetActive(true);
             _healthbar.gameObject.SetActive(false);
             GetComponent<TriggerEvents>().enabled = true;
+            foreach (GameObject _part in _parts)
+            {
+                if (PlayerPrefs.GetInt("color") == 1)
+                {
+                    _part.GetComponent<Renderer>().material.color = Color.white;
+                }
+                else if (PlayerPrefs.GetInt("color") == 2)
+                {
+                    _part.GetComponent<Renderer>().material.color = Color.red;
+                }
+                else if (PlayerPrefs.GetInt("color") == 3)
+                {
+                    _part.GetComponent<Renderer>().material.color = Color.black;
+                }
+                else if (PlayerPrefs.GetInt("color") == 4)
+                {
+                    _part.GetComponent<Renderer>().material.color = Color.yellow;
+                }
+            }
         }
+        else
+        {
+            GetComponent<TriggerEvents>().enabled = false;
+        }
+    }
+
+    public void ScoreIncrease(int score)
+    {
+        _score += score;
+        photonView.RPC("UpdateScore", RpcTarget.AllBuffered, _score);
     }
 
     public void LevelUp()
@@ -79,15 +113,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void ExpIncrease(int _value)
     {
-        if (photonView.IsMine)
-        {
-            _exp += _value;
-            LevelUp();
-            _soundPlaying = true;
-            _audioSource.Stop();
-            _audioSource.PlayOneShot(_gainExp);
-            //ExpIncrease(_exp);
-        }
+        _exp += _value;
+        LevelUp();
+        _soundPlaying = true;
+        _audioSource.Stop();
+        _audioSource.PlayOneShot(_gainExp);
     }
 
     void Update()
@@ -109,7 +139,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (_currentHealth < _maxHealth && _currentHealth > 0)
         {
             _currentHealth += _healthRegain * Time.deltaTime;
-            UpdateHealth(_currentHealth);
+            photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
         }
         if (_currentEnergy < _maxEnergy)
         {
@@ -146,6 +176,36 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             else
             {
                 _animator.SetBool("Death", true);
+            }
+        }
+        foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
+        {
+            scores.Add(player._score);
+        }
+        scores.Sort();
+        scores.Reverse();
+        _rank = scores.IndexOf(_score) + 1;
+        scores.Clear();
+        _playerRank.text = _rank.ToString();
+        if (_rank == 1)
+        {
+            if (ColorUtility.TryParseHtmlString(_numberOneRank, out Color thecolor))
+            {
+                _starColor.color = thecolor;
+            }
+        }
+        else if (_rank == 2)
+        {
+            if (ColorUtility.TryParseHtmlString(_numberTwoRank, out Color thecolor))
+            {
+                _starColor.color = thecolor;
+            }
+        }
+        else
+        {
+            if (ColorUtility.TryParseHtmlString(_normalRankColor, out Color thecolor))
+            {
+                _starColor.color = thecolor;
             }
         }
         HealthBarRotation();
@@ -447,6 +507,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             _currentHealth = newHealth;
         }
+    }
+
+    [PunRPC]
+    void UpdateScore(int score)
+    {
+        _score = score;
     }
 
     void ExpUpdate(int expUpdate)

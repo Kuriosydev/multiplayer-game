@@ -11,11 +11,13 @@ public class Enemy : MonoBehaviourPunCallbacks
     public Vector3 _startPos;
     [SerializeField] int _range, _maxHealth, _attackDamage, _healthRegernation, _expIncrement;
     [SerializeField] float _damageFactor, _currentHealth;
+    [SerializeField] AudioClip _run, _attack, _gothit;
     public Image _healthbar;
     Animator _animator;
     public float _stoppingDistance = 1.5f;
     bool _canHit = true;
     int _hitCounter = 0;
+    AudioSource _audioSource;
 
     void Start()
     {
@@ -26,6 +28,7 @@ public class Enemy : MonoBehaviourPunCallbacks
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
         _animator.SetBool("Death", false);
+        _audioSource = GetComponent<AudioSource>();
         _agent.stoppingDistance = _stoppingDistance;
     }
 
@@ -73,16 +76,23 @@ public class Enemy : MonoBehaviourPunCallbacks
                     {
                         _animator.SetBool("Run", true);
                         _animator.SetBool("Attack", false);
+                        if (!_audioSource.isPlaying)
+                        {
+                            _audioSource.PlayOneShot(_run);
+                        }
                     }
                 }
                 else
                 {
                     _target = null;
                 }
-                if (Vector3.Distance(transform.position, _target.position) > _range && _currentHealth >= _maxHealth)
+                if (_target != null)
                 {
-                    _target = null;
-                    _animator.SetBool("Attack", false);
+                    if (Vector3.Distance(transform.position, _target.position) > _range && _currentHealth >= _maxHealth)
+                    {
+                        _target = null;
+                        _animator.SetBool("Attack", false);
+                    }
                 }
             }
             else
@@ -113,6 +123,10 @@ public class Enemy : MonoBehaviourPunCallbacks
                 else
                 {
                     _animator.SetBool("Run", true);
+                    if (!_audioSource.isPlaying)
+                    {
+                        _audioSource.PlayOneShot(_run);
+                    }
                 }
             }
         }
@@ -124,18 +138,19 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void AfterDeath()
     {
-        if (photonView.IsMine)
+        UpdateHealth(_maxHealth);
+        //FindAnyObjectByType<UiManager>()._localPlayer.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+        if (_target != null)
         {
-            UpdateHealth(_maxHealth);
-            //FindAnyObjectByType<UiManager>()._localPlayer.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
-            if (_target != null)
+            if (_target.CompareTag("Player"))
             {
-                if (_target.CompareTag("Player"))
-                {
-                    _target.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
-                    ObjectTurnOff(photonView.ViewID);
-                    _target = null;
-                }
+                //if(_target.gameObject == FindFirstObjectByType<UiManager>()._localPlayer)
+                //{
+
+                //}
+                _target.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+                ObjectTurnOff(photonView.ViewID);
+                _target = null;
             }
         }
         FindAnyObjectByType<UiManager>().RespawnEnemies(photonView.ViewID);
@@ -168,6 +183,8 @@ public class Enemy : MonoBehaviourPunCallbacks
             _target.gameObject.GetComponent<PlayerMovement>().TakeDamage(_attackDamage);
             _animator.SetInteger("StrikeNumber", _hitCounter);
             _canHit = false;
+            _audioSource.Stop();
+            _audioSource.PlayOneShot(_attack);
         }
     }
 
@@ -191,6 +208,8 @@ public class Enemy : MonoBehaviourPunCallbacks
             _currentHealth -= damage;// * _damageFactor;
             photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
             _animator.SetBool("GotHit", true);
+            _audioSource.Stop();
+            _audioSource.PlayOneShot(_gothit);
         }
     }
 

@@ -1,10 +1,10 @@
+using Photon.Pun;
 using UnityEngine;
 
 public class TriggerEvents : MonoBehaviour
 {
-    public float rayDistance = 5f; // How far the player can interact
-    GameObject _quizPanelHandler, _chestobject;
-    public GameObject _quizPanel;
+    GameObject _quizPanelHandler;
+    public GameObject _quizPanel, _questPanel;
     //bool _quizPanelOpened;
 
     // Update is called once per frame
@@ -37,21 +37,34 @@ public class TriggerEvents : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Chest"))
+        if (gameObject.GetComponent<PhotonView>().IsMine)
         {
-            _quizPanelHandler = Instantiate(_quizPanel);
-        }
-        else if (other.CompareTag("Wall"))
-        {
-            _quizPanelHandler = Instantiate(_quizPanel);
-            _quizPanelHandler.GetComponent<QuizManagerJson>()._questionsCount = 2;
-            _quizPanelHandler.GetComponent<QuizManagerJson>()._totalQuestion.SetActive(false);
-            _quizPanelHandler.GetComponent<QuizManagerJson>()._wall = other.gameObject;
-        }
-        else if (other.CompareTag("Powerup"))
-        {
-            _quizPanelHandler = Instantiate(_quizPanel);
-            _quizPanelHandler.GetComponent<QuizManagerJson>()._powerUp = int.Parse(other.gameObject.name);
+            if (other.CompareTag("Chest"))
+            {
+                _quizPanelHandler = Instantiate(_quizPanel);
+                _quizPanelHandler.GetComponent<QuizManagerJson>()._chest = true;
+            }
+            else if (other.CompareTag("Wall"))
+            {
+                _quizPanelHandler = Instantiate(_quizPanel);
+                _quizPanelHandler.GetComponent<QuizManagerJson>()._questionsCount = 2;
+                _quizPanelHandler.GetComponent<QuizManagerJson>()._totalQuestion.SetActive(false);
+                _quizPanelHandler.GetComponent<QuizManagerJson>()._wall = other.gameObject;
+            }
+            else if (other.CompareTag("Powerup"))
+            {
+                _quizPanelHandler = Instantiate(_quizPanel);
+                _quizPanelHandler.GetComponent<QuizManagerJson>()._powerUp = int.Parse(other.gameObject.name);
+                if(gameObject.GetComponent<PlayerMovement>()._money >= 300)
+                {
+                    _quizPanelHandler.GetComponent<QuizManagerJson>()._buy.gameObject.SetActive(true);
+                }
+            }
+            else if (other.CompareTag("Quest"))
+            {
+                _quizPanelHandler = Instantiate(_questPanel);
+                _quizPanelHandler.GetComponent<QuestPanel>()._questNumber = int.Parse(other.gameObject.name);
+            }
         }
     }
 }

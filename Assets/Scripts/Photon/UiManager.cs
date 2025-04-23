@@ -4,11 +4,12 @@ using Photon.Voice.Unity;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UiManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] TMP_Text _healthText, _energyText, _expText , _levelText;
+    [SerializeField] TMP_Text _healthText, _energyText, _expText , _levelText, _money, _rank;
     [SerializeField] Sprite _micOn, _micOff;
     public Vector3[] _playerPosition, _guardPositions, _chiefPosition, _traineePosition;
     [SerializeField] Image _healthBar, _energyBar, _expBar;
@@ -16,7 +17,7 @@ public class UiManager : MonoBehaviourPunCallbacks
     [SerializeField] Button _jump, _dash, _mic, _meleeMode, _swordMode, _devilMode;
     [SerializeField] GameObject _player, _guard, _chief, _trainee, _dummyBoss;
     public PlayerMovement _localPlayer;
-    public int _reSpawn = 1;
+    public int _reSpawn = 1, _questType;
     [SerializeField] Recorder _recorder;
     [SerializeField] Slider _slider;
 
@@ -85,7 +86,9 @@ public class UiManager : MonoBehaviourPunCallbacks
             _expBar.fillAmount = (float)_localPlayer.GetComponent<PlayerMovement>()._exp / (float)_localPlayer.GetComponent<PlayerMovement>()._expRequired;
             _expText.text = _localPlayer.GetComponent<PlayerMovement>()._exp.ToString() + "/" + _localPlayer.GetComponent<PlayerMovement>()._expRequired.ToString();
             _devilMode.image.fillAmount = _localPlayer.GetComponent<PlayerMovement>()._timer / 120f;
-            if(_localPlayer.GetComponent<PlayerMovement>()._timer <= 0)
+            _money.text = "$ " + _localPlayer.GetComponent<PlayerMovement>()._money.ToString();
+            _rank.text = "Rank " + _localPlayer.GetComponent<PlayerMovement>()._rank.ToString();
+            if (_localPlayer.GetComponent<PlayerMovement>()._timer <= 0)
             {
                 _devilMode.gameObject.SetActive(false);
             }
@@ -130,6 +133,37 @@ public class UiManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void QuestStart(int number)
+    {
+        if(number == 1)
+        {
+
+        }
+        else if(number == 2)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
+    void EnemyKill()
+    {
+
+    }
+
+    void BossKill()
+    {
+
+    }
+
+    void closeQuest()
+    {
+        QuestStart(0);
+    }
+
     public async void RespawnEnemies(int _enemyModel)
     {
         await Task.Delay(40000);
@@ -148,6 +182,11 @@ public class UiManager : MonoBehaviourPunCallbacks
         _localPlayer.DashForward();
     }
 
+    void ColorChange()
+    {
+
+    }
+
     public async void WallReappear(GameObject _wall)
     {
         await Task.Delay(10000);
@@ -157,46 +196,16 @@ public class UiManager : MonoBehaviourPunCallbacks
     void MeleeMode()
     {
         _localPlayer.MeleeMode();
-        //else
-        //{
-        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //}
     }
 
     void SwordMode()
     {
         _localPlayer.SwordMode();
-        //if (_swordMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
-        //{
-        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
-        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //}
-        //else
-        //{
-        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //}
     }
 
     void DevilMode()
     {
         _localPlayer.DevilFruitMode();
-        //if (_devilMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
-        //{
-        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonSelected;
-        //}
-        //else
-        //{
-        //    _meleeMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _swordMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //    _devilMode.gameObject.GetComponent<Image>().sprite = _buttonUnSelected;
-        //}
     }
 
     void JumpClicked()
@@ -230,5 +239,4 @@ public class UiManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Master Client switched to: " + newMasterClient.NickName);
     }
-
 }

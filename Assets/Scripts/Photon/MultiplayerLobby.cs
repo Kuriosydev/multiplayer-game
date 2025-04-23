@@ -7,29 +7,38 @@ using UnityEngine.SceneManagement;
 
 public class MultiplayerLobby : MonoBehaviourPunCallbacks
 {
-    [SerializeField] GameObject _roomJoiningPanel, _waitingRoomPanel, _ConnectionPanel, _nameItemprefab, _customJoin, _directJoin;//, _roomItemprefab;
+    [SerializeField] GameObject _roomJoiningPanel, _ConnectionPanel, _nameItemprefab, _customJoin, _directJoin, _playerSelection;//, _roomItemprefab;
     [SerializeField] TMP_InputField _playerName, _randomPlayerName, _roomName;
     [SerializeField] TMP_Text _roomNameAndCreater, _roomServerMessages;
     [SerializeField] Transform _playerNameSpawnLocation;//, _roomNameSpawnLocation;
     public bool _join = true, _create = true, _connected = false, _randomJoinCreate = false;
-    //[SerializeField] Toggle _visiblehandler;
 
-    private void Awake()
-    {
-        //if (!PlayerPrefs.HasKey("Tutorial"))
-        //{
-        //    SceneManager.LoadScene(2);
-        //}
-    }
 
     private void Start()
     {
-        PlayerPrefs.SetInt("Exp", 100);
+        _randomPlayerName.onSelect.AddListener(NameSelect);
+        _randomPlayerName.onDeselect.AddListener(NameDeselect);
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.EnableCloseConnection = true;
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectToBestCloudServer();
         PhotonNetwork.ConnectToRegion("us");
+    }
+
+    void NameSelect(string i)
+    {
+        if (i.Length < 1)
+        {
+            _randomPlayerName.text = " ";
+        }
+    }
+
+    void NameDeselect(string i)
+    {
+        if (i == " ")
+        {
+            _randomPlayerName.text = "";
+        }
     }
 
     private void Update()
@@ -88,12 +97,17 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
-    public void JoinOrCreateRandomRoom()
+    public void Play()
     {
-        if (PhotonNetwork.JoinRandomOrCreateRoom())
-        {
-            _randomJoinCreate = true;
-        }
+        _directJoin.SetActive(false);
+        _playerSelection.SetActive(true);
+    }
+    
+    public void OncolorClicked(int _color)
+    {
+        _customJoin.SetActive(true);
+        _playerSelection.SetActive(false);
+        PlayerPrefs.SetInt("color", _color);
     }
 
     public void CreateRoom()
@@ -102,7 +116,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         {
             if (_create)
             {
-                if (!PhotonNetwork.CreateRoom(_roomName.text, new RoomOptions() { IsVisible = false, MaxPlayers = 4 }))
+                if (!PhotonNetwork.CreateRoom(_roomName.text, new RoomOptions() { IsVisible = false, MaxPlayers = 10 }))
                 {
                     _create = true;
                     Invoke("JoinReset", 0.5f);
@@ -118,6 +132,16 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
+    public void Tutorial()
+    {
+        SceneManager.LoadScene(2);
+    }
+
+    public void JoinorCreateRandom()
+    {
+        PhotonNetwork.JoinRandomOrCreateRoom();
+    }
+
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
@@ -129,8 +153,8 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         else
         {
             _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
-            _roomJoiningPanel.SetActive(false);
-            _waitingRoomPanel.SetActive(true);
+            //_roomJoiningPanel.SetActive(false);
+            //_waitingRoomPanel.SetActive(true);
             Dictionary<int, Player> i = PhotonNetwork.CurrentRoom.Players;
             foreach (Player player in i.Values)
             {
@@ -138,6 +162,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
                 text.name = player.UserId;
                 text.GetComponent<TMP_Text>().text = player.NickName;
             }
+            StartClicked();
         }
     }
 
@@ -177,8 +202,9 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
             _connected = true;
             _roomNameAndCreater.text = "Room: '" + PhotonNetwork.CurrentRoom.Name + "' Created by: '" + PhotonNetwork.MasterClient.NickName + "'";
             _create = false;
-            _roomJoiningPanel.SetActive(false);
-            _waitingRoomPanel.SetActive(true);
+            //_roomJoiningPanel.SetActive(false);
+            //_waitingRoomPanel.SetActive(true);
+            //StartClicked();
         }
     }
 
@@ -207,20 +233,19 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
                 PhotonNetwork.JoinLobby();
                 _roomJoiningPanel.SetActive(true);
                 _create = true;
-                _waitingRoomPanel.SetActive(false);
+                //_waitingRoomPanel.SetActive(false);
             }
         }
     }
 
     public void StartClicked()
     {
-        if (PhotonNetwork.LocalPlayer.UserId == PhotonNetwork.MasterClient.UserId)
-        {
-            PhotonNetwork.CurrentRoom.IsOpen = false;
+        //if (PhotonNetwork.LocalPlayer.UserId == PhotonNetwork.MasterClient.UserId)
+        //{
             PhotonNetwork.CurrentRoom.IsVisible = false;
             PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.LoadLevel(1);
-        }
+        //}
     }
 
     void Messagenull()

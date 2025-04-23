@@ -26,9 +26,9 @@
                 "210",
                 "220",
                 "212",
-                "220"
+                "230"
             ],
-            "correctAnswerIndex": 1
+            "correctAnswerIndex": 0
         },
         {
             "questionText": "What is 71 - 56?",
@@ -88,7 +88,7 @@
                 "35",
                 "40"
             ],
-            "correctAnswerIndex": 1
+            "correctAnswerIndex": 0
         },
         {
             "questionText": "What comes next in this skip-counting pattern? 3, 6, 9, 12, ___?",
@@ -98,7 +98,7 @@
                 "18",
                 "20"
             ],
-            "correctAnswerIndex": 2
+            "correctAnswerIndex": 1
         }
   ]
 }

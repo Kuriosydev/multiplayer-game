@@ -49,6 +49,7 @@ MonoBehaviour:
   - RPC_StopParticle
   - ObjectTurnOff
   - UpdateStartPos
+  - UpdateScore
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
