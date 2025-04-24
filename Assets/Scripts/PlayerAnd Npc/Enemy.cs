@@ -2,6 +2,7 @@ using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using static UnityEngine.ParticleSystem;
 
 public class Enemy : MonoBehaviourPunCallbacks
 {
@@ -11,13 +12,14 @@ public class Enemy : MonoBehaviourPunCallbacks
     public Vector3 _startPos;
     [SerializeField] int _range, _maxHealth, _attackDamage, _healthRegernation, _expIncrement;
     [SerializeField] float _damageFactor, _currentHealth;
-    [SerializeField] AudioClip _run, _attack, _gothit;
+    [SerializeField] AudioClip _run, _attack, _death;//gotHit
     public Image _healthbar;
     Animator _animator;
     public float _stoppingDistance = 1.5f;
     bool _canHit = true;
     int _hitCounter = 0;
     AudioSource _audioSource;
+    [SerializeField] GameObject _deathEffect, _particle;
 
     void Start()
     {
@@ -119,6 +121,7 @@ public class Enemy : MonoBehaviourPunCallbacks
                 {
                     _agent.velocity = Vector3.zero;
                     _animator.SetBool("Run", false);
+                    _audioSource.Stop();
                 }
                 else
                 {
@@ -132,7 +135,13 @@ public class Enemy : MonoBehaviourPunCallbacks
         }
         else
         {
-            _animator.SetBool("Death", true);
+            if (!_animator.GetBool("Death"))
+            {
+                _audioSource.Stop();
+                _particle = Instantiate(_deathEffect, transform.position, Quaternion.identity);
+                _animator.SetBool("Death", true);
+                _audioSource.PlayOneShot(_death);
+            }
         }
     }
 
@@ -144,13 +153,27 @@ public class Enemy : MonoBehaviourPunCallbacks
         {
             if (_target.CompareTag("Player"))
             {
-                //if(_target.gameObject == FindFirstObjectByType<UiManager>()._localPlayer)
-                //{
-
-                //}
-                _target.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
+                //DestroyImmediate(_particle, true);
                 ObjectTurnOff(photonView.ViewID);
+                if (FindAnyObjectByType<UiManager>()._questAccepted)
+                {
+                    if (FindAnyObjectByType<UiManager>()._questType == 1)
+                    {
+                        FindAnyObjectByType<UiManager>()._kills += 1;
+                        FindAnyObjectByType<UiManager>().QuestCompleteCheck();
+                    }
+                    else
+                    {
+                        if (gameObject.transform.localScale.x == 3)
+                        {
+                            FindAnyObjectByType<UiManager>()._kills += 1;
+                            FindAnyObjectByType<UiManager>().QuestCompleteCheck();
+                        }
+                    }
+                }
+                _target.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
                 _target = null;
+
             }
         }
         FindAnyObjectByType<UiManager>().RespawnEnemies(photonView.ViewID);
@@ -207,9 +230,12 @@ public class Enemy : MonoBehaviourPunCallbacks
             _target = _theplayer.transform;
             _currentHealth -= damage;// * _damageFactor;
             photonView.RPC("UpdateHealth", RpcTarget.AllBuffered, _currentHealth);
-            _animator.SetBool("GotHit", true);
-            _audioSource.Stop();
-            _audioSource.PlayOneShot(_gothit);
+            if (transform.localScale != new Vector3(3, 3, 3))
+            {
+                _animator.SetBool("GotHit", true);
+            }
+            //_audioSource.Stop();
+            //_audioSource.PlayOneShot(_gothit);
         }
     }
 

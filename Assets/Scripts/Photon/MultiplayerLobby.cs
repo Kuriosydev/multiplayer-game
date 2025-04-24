@@ -18,6 +18,8 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     {
         _randomPlayerName.onSelect.AddListener(NameSelect);
         _randomPlayerName.onDeselect.AddListener(NameDeselect);
+        _roomName.onSelect.AddListener(RoomSelect);
+        _roomName.onDeselect.AddListener(RoomDeselect);
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.EnableCloseConnection = true;
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -38,6 +40,22 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         if (i == " ")
         {
             _randomPlayerName.text = "";
+        }
+    }
+
+    void RoomSelect(string i)
+    {
+        if (i.Length < 1)
+        {
+            _roomName.text = " ";
+        }
+    }
+
+    void RoomDeselect(string i)
+    {
+        if (i == " ")
+        {
+            _roomName.text = "";
         }
     }
 
@@ -140,6 +158,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     public void JoinorCreateRandom()
     {
         PhotonNetwork.JoinRandomOrCreateRoom();
+        _randomJoinCreate = true;
     }
 
     public override void OnJoinedRoom()
@@ -215,8 +234,9 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void MainMenuRoomLeft()
     {
-        SceneManager.LoadScene(0);
-        PhotonNetwork.LeaveRoom();
+        _directJoin.SetActive(true);
+        _playerSelection.SetActive(false);
+        _customJoin.SetActive(false);
     }
 
     public void RoomExit()

@@ -7,10 +7,14 @@ public class QuestPanel : MonoBehaviour
     public int _questNumber;
     [SerializeField] Button _accept, _neverMind;
     [SerializeField] TMP_Text _quest;
-    string _enemyQuest = "Kill 10 Enemies\nReward $1500", _bossQuest = "Kill Hollowood\nReward $3000";
+    AudioSource _audioSource;
+    [SerializeField] AudioClip _popSound;
+    string _enemyQuest = "Defeat 10 Enemies\n$1500, XP 500", _bossQuest = "Defeat Hollowood\n$3000, XP 1000";
 
     void Start()
     {
+        _audioSource = GetComponent<AudioSource>();
+        _audioSource.PlayOneShot(_popSound);
         if(_questNumber == 1)
         {
             _quest.text = _enemyQuest;
@@ -25,12 +29,14 @@ public class QuestPanel : MonoBehaviour
 
     void Accept()
     {
-        FindFirstObjectByType<UiManager>().QuestStart(_questNumber);
+        FindFirstObjectByType<UiManager>()._questAccepted = true;
+        FindFirstObjectByType<UiManager>().QuestStart(_questNumber, _quest.text);
         Destroy(gameObject);
     }
      
     void NeverMind()
     {
+        FindFirstObjectByType<UiManager>()._questAccepted = false;
         Destroy(gameObject);
     }
 }

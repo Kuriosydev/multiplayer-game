@@ -2209,7 +2209,7 @@ PrefabInstance:
     - target: {fileID: -7933122972773080146, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: -7655872403321392018, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 87.2539
@@ -2225,7 +2225,7 @@ PrefabInstance:
     - target: {fileID: -7263015266732235272, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: -6871973059646590994, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -46.04397
@@ -2337,7 +2337,7 @@ PrefabInstance:
     - target: {fileID: -4329922857456236744, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: -3952486968618182649, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.0000012039575
@@ -2353,7 +2353,7 @@ PrefabInstance:
     - target: {fileID: -3053669679340262298, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: -2967747473156249781, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 90
@@ -2429,7 +2429,7 @@ PrefabInstance:
     - target: {fileID: -935533772807217311, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: -697617235144157096, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -0.0000027794922
@@ -2581,7 +2581,7 @@ PrefabInstance:
     - target: {fileID: 3680723932289504619, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: 4042940087036422592, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.000008684144
@@ -2697,7 +2697,7 @@ PrefabInstance:
     - target: {fileID: 7780057163218742532, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 252135f7dc760344a9b7a6b5d40e1fac, type: 2}
+      objectReference: {fileID: 2100000, guid: ac04f11ee6fc86242b5d0552c361a9bc, type: 2}
     - target: {fileID: 7852489863413689324, guid: 9a5fe21257016dd4f8669c042e168e82, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 90
@@ -3032,15 +3032,16 @@ MonoBehaviour:
   _starColor: {fileID: 1988290264967234998}
   _playerName: {fileID: 7848678851836396842}
   _playerRank: {fileID: 9019667731648548131}
-  _punchSound: {fileID: 8300000, guid: 9282e6c0ce86e584c95641c89b225ce3, type: 3}
+  _punchSound: {fileID: 8300000, guid: 142df157f5cd80e40bde74ccf823efd0, type: 3}
   _walkSound: {fileID: 8300000, guid: 6ab0ff331e839394185d87c61d8489a4, type: 3}
   _jumpSound: {fileID: 8300000, guid: 72ff16121d595e54d99c004614c41456, type: 3}
   _doubleJumpSound: {fileID: 8300000, guid: 14854cd8edb21b04ebeb4b2b731ecc80, type: 3}
-  _runSound: {fileID: 8300000, guid: dc06ade4eb399a443974de2b13d762fa, type: 3}
+  _runSound: {fileID: 8300000, guid: d9c847ae845129441956fc013e6c905b, type: 3}
   _swordSound: {fileID: 8300000, guid: cad5a75bb9d4e1344b7049dc8bbd27ed, type: 3}
   _dashSound: {fileID: 8300000, guid: 72ff16121d595e54d99c004614c41456, type: 3}
   _swimSound: {fileID: 8300000, guid: e5f022761c09f48458394bdac0dd2e61, type: 3}
   _gainExp: {fileID: 8300000, guid: cfae1932ade34b347a7f6efedd476459, type: 3}
+  _death: {fileID: 8300000, guid: 05c3db4afc32899419158b3c25f86038, type: 3}
   _followCamera: {fileID: 1400711800703588215}
   _audioSource: {fileID: 7100467973911976674}
   _ground:
@@ -3059,7 +3060,7 @@ MonoBehaviour:
   _healthAdd: 25
   _attackAdd: 10
   _energyRegain: 5
-  _energyDeduction: 15
+  _energyDeduction: 30
   _exp: 100
   _level: 1
   _expRequired: 0
@@ -3072,6 +3073,8 @@ MonoBehaviour:
   _devilFruit: 0
   _money: 0
   _score: 0
+  _deathEffect: {fileID: 4924508274929071776, guid: 0edef91621bb6b34384ccc9dbb98729c, type: 3}
+  _particle: {fileID: 0}
 --- !u!95 &6303631145426199537
 Animator:
   serializedVersion: 7

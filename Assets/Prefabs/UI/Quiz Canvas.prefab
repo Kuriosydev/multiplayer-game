@@ -659,8 +659,12 @@ MonoBehaviour:
   _correctAnswer: {fileID: 8300000, guid: f79179109a6159048acef8f7102e8875, type: 3}
   _wrongAnswer: {fileID: 8300000, guid: 76eea4e769b5f42499990a3fdd7a41be, type: 3}
   _arenaUnlock: {fileID: 8300000, guid: 597ab907968c67e449dcff203880ba1d, type: 3}
+  _wallDestroyed: {fileID: 8300000, guid: af750d6c1c27f8c4dbacf83f18966348, type: 3}
+  _devilRoar: {fileID: 8300000, guid: 0ca04c4d9c22192458d5453d06d2f001, type: 3}
+  _chestSound: {fileID: 8300000, guid: a15cad7f926a2a3498647ceb776c2198, type: 3}
   _buy: {fileID: 1959938933379005615}
   _wall: {fileID: 0}
+  _coins: {fileID: 8761809746921942288, guid: ada111613011a814c9b87dac8b6d866c, type: 3}
   _questionsCount: 0
   _powerUp: 0
   questionText: {fileID: 4878690888803626573}
@@ -671,6 +675,7 @@ MonoBehaviour:
   - {fileID: 1214654701419335142}
   - {fileID: 5218486880000772434}
   _chest: 0
+  _bought: 0
   _questionsNo:
   - {fileID: 3378531104453985125}
   - {fileID: 8425521648986348632}
@@ -680,6 +685,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d23e31107e694224d85ac835757a01d5, type: 3}
   _quizPanel: {fileID: 946826381382596423}
   _totalQuestion: {fileID: 4533751538479076851}
+  _wallDestroy: {fileID: 8974203713140315807, guid: 709b0bd6b0b625249a98409dd7a87343, type: 3}
 --- !u!82 &3652712293889559820
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1477,8 +1483,12 @@ MonoBehaviour:
   _correctAnswer: {fileID: 0}
   _wrongAnswer: {fileID: 0}
   _arenaUnlock: {fileID: 0}
+  _wallDestroyed: {fileID: 0}
+  _devilRoar: {fileID: 0}
+  _chestSound: {fileID: 0}
   _buy: {fileID: 0}
   _wall: {fileID: 0}
+  _coins: {fileID: 0}
   _questionsCount: 0
   _powerUp: 0
   questionText: {fileID: 4878690888803626573}
@@ -1489,6 +1499,7 @@ MonoBehaviour:
   - {fileID: 1214654701419335142}
   - {fileID: 5218486880000772434}
   _chest: 0
+  _bought: 0
   _questionsNo:
   - {fileID: 3378531104453985125}
   - {fileID: 8425521648986348632}
@@ -1498,6 +1509,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d23e31107e694224d85ac835757a01d5, type: 3}
   _quizPanel: {fileID: 946826381382596423}
   _totalQuestion: {fileID: 4533751538479076851}
+  _wallDestroy: {fileID: 0}
 --- !u!1 &3741415485350871285
 GameObject:
   m_ObjectHideFlags: 0

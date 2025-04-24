@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] GameObject _leftHand, _rightHand, _dashEffect, _knife1, _knife2, _spawnLocation, _devilFruit1, _devilFruit2;
     public Image _healthbar, _starColor;
     [SerializeField] TMP_Text _playerName, _playerRank;
-    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound, _gainExp;
+    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound, _gainExp, _death;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
     public AudioSource _audioSource;
@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     int _hitCounter = 0, _jumpCount = 0;
     public int _state = 0, _devilFruit = 0, _money, _score;
     bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying = false, _canDash = true;
+    [SerializeField] GameObject _deathEffect, _particle;
 
     private void Awake()
     {
@@ -70,7 +71,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 if (PlayerPrefs.GetInt("color") == 1)
                 {
-                    _part.GetComponent<Renderer>().material.color = Color.white;
+                    _part.GetComponent<Renderer>().material.color = Color.blue;
                 }
                 else if (PlayerPrefs.GetInt("color") == 2)
                 {
@@ -78,11 +79,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                 }
                 else if (PlayerPrefs.GetInt("color") == 3)
                 {
-                    _part.GetComponent<Renderer>().material.color = Color.black;
+                    _part.GetComponent<Renderer>().material.color = Color.green;
                 }
                 else if (PlayerPrefs.GetInt("color") == 4)
                 {
-                    _part.GetComponent<Renderer>().material.color = Color.yellow;
+                    _part.GetComponent<Renderer>().material.color = Color.magenta;
                 }
             }
         }
@@ -155,6 +156,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
         if (photonView.IsMine)
         {
+            LevelUp();
             if (!_animator.GetBool("JumpCheck") && _animator.GetInteger("Jump") > 0)
             {
                 GroundCheck();
@@ -175,7 +177,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
             else
             {
-                _animator.SetBool("Death", true);
+                if (!_animator.GetBool("Death"))
+                {
+                    _audioSource.Stop();
+                    _particle = Instantiate(_deathEffect, transform.position, Quaternion.identity);
+                    _animator.SetBool("Death", true);
+                    _audioSource.PlayOneShot(_death);
+                }
             }
         }
         foreach (PlayerMovement player in FindObjectsByType<PlayerMovement>(FindObjectsSortMode.None))
@@ -215,7 +223,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
-            //FindFirstObjectByType<UiManager>()._reSpawn = 1;
+            //DestroyImmediate(_particle, true);
             _animator.SetBool("Death", false);
             transform.position = FindFirstObjectByType<UiManager>()._playerPosition[Random.Range(0, FindFirstObjectByType<UiManager>()._playerPosition.Length - 1)];
             _followCamera.gameObject.SetActive(false);

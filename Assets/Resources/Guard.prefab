@@ -1216,11 +1216,13 @@ MonoBehaviour:
   _expIncrement: 100
   _damageFactor: 0
   _currentHealth: 0
-  _run: {fileID: 8300000, guid: dc06ade4eb399a443974de2b13d762fa, type: 3}
+  _run: {fileID: 8300000, guid: d9c847ae845129441956fc013e6c905b, type: 3}
   _attack: {fileID: 8300000, guid: cad5a75bb9d4e1344b7049dc8bbd27ed, type: 3}
-  _gothit: {fileID: 8300000, guid: 91bd8d37123e807418c02b8d19a878e4, type: 3}
+  _death: {fileID: 8300000, guid: 05c3db4afc32899419158b3c25f86038, type: 3}
   _healthbar: {fileID: 6179666057385833695}
   _stoppingDistance: 1.5
+  _deathEffect: {fileID: 4924508274929071776, guid: 0edef91621bb6b34384ccc9dbb98729c, type: 3}
+  _particle: {fileID: 0}
 --- !u!95 &4154409898488326833
 Animator:
   serializedVersion: 7
