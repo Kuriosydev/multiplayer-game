@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Coins : MonoBehaviour
 {
+    public Vector3 rotationSpeed = new Vector3(0, 180, 0);
     UiManager uiManager;
     private void Start()
     {
@@ -11,7 +12,7 @@ public class Coins : MonoBehaviour
 
     private void Update()
     {
-       transform.rotation = Quaternion.Euler(0f, transform.rotation.y + 25f, 0f);
+        transform.Rotate(rotationSpeed * Time.deltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)

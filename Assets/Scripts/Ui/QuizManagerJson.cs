@@ -202,8 +202,7 @@ public class QuizManagerJson : MonoBehaviour
             Instantiate(_coins, _wall.transform.position, Quaternion.identity);
             Instantiate(_coins, _wall.transform.position, Quaternion.identity);
             Instantiate(_coins, _wall.transform.position, Quaternion.identity);
-            //Instantiate(_coins, _wall.transform.position, Quaternion.identity);
-            //Instantiate(_coins, _wall.transform.position, Quaternion.identity);
+            Instantiate(_coins, _wall.transform.position, Quaternion.identity);
             _particle = Instantiate(_wallDestroy, new Vector3(_wall.transform.position.x,
             FindFirstObjectByType<UiManager>()._localPlayer.transform.position.y,
             FindFirstObjectByType<UiManager>()._localPlayer.transform.position.z), Quaternion.identity);
