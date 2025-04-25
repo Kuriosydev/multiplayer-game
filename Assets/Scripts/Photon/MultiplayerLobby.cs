@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 public class MultiplayerLobby : MonoBehaviourPunCallbacks
 {
     [SerializeField] GameObject _roomJoiningPanel, _ConnectionPanel, _nameItemprefab, _customJoin, _directJoin, _playerSelection;//, _roomItemprefab;
+    [SerializeField]
+    GameObject[] _parts;
     [SerializeField] TMP_InputField _playerName, _randomPlayerName, _roomName;
     [SerializeField] TMP_Text _roomNameAndCreater, _roomServerMessages;
     [SerializeField] Transform _playerNameSpawnLocation;//, _roomNameSpawnLocation;
@@ -16,8 +18,23 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        _randomPlayerName.onSelect.AddListener(NameSelect);
-        _randomPlayerName.onDeselect.AddListener(NameDeselect);
+        if (PlayerPrefs.HasKey("exit"))
+        {
+            if (PlayerPrefs.GetInt("exit") == 1)
+            {
+                _ConnectionPanel.SetActive(false);
+                _roomJoiningPanel.SetActive(true);
+                _connected = true;
+                PlayerPrefs.SetInt("exit", 0);
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("exit", 0);
+        }
+        PhotonNetwork.Disconnect();
+        _playerName.onSelect.AddListener(NameSelect);
+        _playerName.onDeselect.AddListener(NameDeselect);
         _roomName.onSelect.AddListener(RoomSelect);
         _roomName.onDeselect.AddListener(RoomDeselect);
         PhotonNetwork.ConnectUsingSettings();
@@ -31,7 +48,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     {
         if (i.Length < 1)
         {
-            _randomPlayerName.text = " ";
+            _playerName.text = " ";
         }
     }
 
@@ -39,7 +56,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     {
         if (i == " ")
         {
-            _randomPlayerName.text = "";
+            _playerName.text = "";
         }
     }
 
@@ -121,11 +138,30 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         _playerSelection.SetActive(true);
     }
     
-    public void OncolorClicked(int _color)
+    public void OncolorClicked(int _colorNumber)
     {
         _customJoin.SetActive(true);
         _playerSelection.SetActive(false);
-        PlayerPrefs.SetInt("color", _color);
+        PlayerPrefs.SetInt("color", _colorNumber);
+        foreach (GameObject _part in _parts)
+        {
+            if (_colorNumber == 1)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.red;
+            }
+            else if (_colorNumber == 2)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.blue;
+            }
+            else if (_colorNumber == 3)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.magenta;
+            }
+            else if (_colorNumber == 4)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.green;
+            }
+        }
     }
 
     public void CreateRoom()
@@ -348,4 +384,9 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         _create = true;
     }
 
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetInt("exit", 0);
+    }
 }

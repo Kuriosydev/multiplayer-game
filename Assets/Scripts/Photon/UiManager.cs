@@ -26,6 +26,8 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        PlayerPrefs.SetInt("exit", 0);
+        PhotonNetwork.KeepAliveInBackground =  100000;
         _slider.onValueChanged.AddListener(SliderValueChanged);
         _jump.onClick.AddListener(JumpClicked);
         _meleeMode.onClick.AddListener(MeleeMode);
@@ -170,6 +172,20 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     }
 
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetInt("exit", 0);
+    }
+
+    public void Exit()
+    {
+        PlayerPrefs.SetInt("exit", 1);
+        PhotonNetwork.LeaveLobby();
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
+        SceneManager.LoadScene(0);
+    }
+
     public void QuestCompleteCheck()
     {
         _requireMents.text = _kills.ToString() + "/" + _requiredKills.ToString();
@@ -239,10 +255,6 @@ public class UiManager : MonoBehaviourPunCallbacks
         _localPlayer.DashForward();
     }
 
-    void ColorChange()
-    {
-
-    }
 
     public async void WallReappear(GameObject _wall)
     {

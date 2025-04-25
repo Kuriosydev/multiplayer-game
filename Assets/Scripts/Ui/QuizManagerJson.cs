@@ -16,18 +16,15 @@ public class QuizManagerJson : MonoBehaviour
         public int correctAnswerIndex;
     }
 
-    [System.Serializable]
-    public class QuestionList
-    {
-        public List<Question> questions;
-    }
+    public List<Question> questions;
+    
 
     [SerializeField] AudioClip _correctAnswer, _wrongAnswer, _arenaUnlock, _wallDestroyed, _devilRoar, _chestSound;
     public Button _buy;
     AudioSource _audiosource;
     public GameObject _wall, _coins;
     private bool _isAnswered = false;
-    private List<Question> questions;
+    //private List<Question> questions;
     private int currentQuestionIndex = 0;
     private int _score = 0;
     public int _questionsCount = 0;
@@ -54,52 +51,56 @@ public class QuizManagerJson : MonoBehaviour
     {
         _audiosource = GetComponent<AudioSource>();
         _buy.onClick.AddListener(Close);
-        StartCoroutine(LoadQuestions());
-        //DisplayQuestion();
+        for(int i = 40; i< 5000; i++)
+        {
+            questions.Add(questions[i - 39]);
+        }
+        //StartCoroutine(LoadQuestions());
+         DisplayQuestion();
     }
 
-    void PCLoadQuestions()
-    {
-        string filePath = Path.Combine(Application.streamingAssetsPath, "questions.json");
+    //void PCLoadQuestions()
+    //{
+    //    string filePath = Path.Combine(Application.streamingAssetsPath, "questions.json");
 
-        if (File.Exists(filePath))
-        {
-            string json = File.ReadAllText(filePath);
-            QuestionList ql = JsonUtility.FromJson<QuestionList>(json);
-            questions = ql.questions;
-        }
-        else
-        {
-            Debug.LogError("JSON file not found at: " + filePath);
-            questions = new List<Question>();
-        }
-    }
+    //    if (File.Exists(filePath))
+    //    {
+    //        string json = File.ReadAllText(filePath);
+    //        QuestionList ql = JsonUtility.FromJson<QuestionList>(json);
+    //        questions = ql.questions;
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("JSON file not found at: " + filePath);
+    //        questions = new List<Question>();
+    //    }
+    //}
 
-    IEnumerator LoadQuestions()
-    {
-        //TextAsset jsonFile = Resources.Load<TextAsset>("questions");
+//    IEnumerator LoadQuestions()
+//    {
+//        //TextAsset jsonFile = Resources.Load<TextAsset>("questions");
 
-        string filePath = Path.Combine(Application.streamingAssetsPath, "questions.json");
+//        string filePath = Path.Combine(Application.streamingAssetsPath, "questions.json");
 
-        UnityWebRequest www = UnityWebRequest.Get(filePath);
-        yield return www.SendWebRequest();
+//        UnityWebRequest www = UnityWebRequest.Get(filePath);
+//        yield return www.SendWebRequest();
 
-#if UNITY_2020_1_OR_NEWER
-        if (www.result != UnityWebRequest.Result.Success)
-#else
-    if (www.isNetworkError || www.isHttpError)
-#endif
-        {
-            Debug.LogError("Failed to load questions: " + www.error);
-        }
-        else
-        {
-            string json = www.downloadHandler.text;
-            QuestionList ql = JsonUtility.FromJson<QuestionList>(json);
-            questions = ql.questions;
-            DisplayQuestion();
-        }
-    }
+//#if UNITY_2020_1_OR_NEWER
+//        if (www.result != UnityWebRequest.Result.Success)
+//#else
+//    if (www.isNetworkError || www.isHttpError)
+//#endif
+//        {
+//            Debug.LogError("Failed to load questions: " + www.error);
+//        }
+//        else
+//        {
+//            string json = www.downloadHandler.text;
+//            QuestionList ql = JsonUtility.FromJson<QuestionList>(json);
+//            questions = ql.questions;
+//            DisplayQuestion();
+//        }
+//    }
 
     void DisplayQuestion()
     {

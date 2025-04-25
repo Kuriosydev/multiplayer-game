@@ -656,6 +656,292 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 219164324f84e8847be3d88af7373b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  questions:
+  - questionText: What is 45 + 28?
+    options:
+    - 63
+    - 73
+    - 75
+    - 85
+    correctAnswerIndex: 1
+  - questionText: What is 58 - 32?
+    options:
+    - 25
+    - 26
+    - 27
+    - 28
+    correctAnswerIndex: 1
+  - questionText: What is the sum of 123 and 87?
+    options:
+    - 210
+    - 220
+    - 212
+    - 230
+    correctAnswerIndex: 0
+  - questionText: What is 71 - 56?
+    options:
+    - 15
+    - 14
+    - 13
+    - 12
+    correctAnswerIndex: 0
+  - questionText: What is the value of the digit 6 in the number 562?
+    options:
+    - 6
+    - 60
+    - 600
+    - 6000
+    correctAnswerIndex: 1
+  - questionText: Which number has 3 tens and 5 ones?
+    options:
+    - 53
+    - 35
+    - 305
+    - 503
+    correctAnswerIndex: 1
+  - questionText: What is the number represented by 4 hundreds, 5 tens, and 7 ones?
+    options:
+    - 457
+    - 547
+    - 475
+    - 4570
+    correctAnswerIndex: 0
+  - questionText: What is the next number in this pattern? 10, 20, 30, 40, ___?
+    options:
+    - 50
+    - 45
+    - 35
+    - 60
+    correctAnswerIndex: 0
+  - questionText: What is the next number in the pattern? 5, 10, 15, 20, ___?
+    options:
+    - 25
+    - 30
+    - 35
+    - 40
+    correctAnswerIndex: 1
+  - questionText: What comes next in this skip-counting pattern? 3, 6, 9, 12, ___?
+    options:
+    - 14
+    - 15
+    - 18
+    - 20
+    correctAnswerIndex: 1
+  - questionText: Which tool would you use to measure the length of a pencil?
+    options:
+    - Thermometer
+    - Ruler
+    - Scale
+    - Clock
+    correctAnswerIndex: 1
+  - questionText: How many inches are in 1 foot?
+    options:
+    - 10
+    - 12
+    - 14
+    - 15
+    correctAnswerIndex: 1
+  - questionText: Which unit of measurement would you use to measure the weight of
+      an apple?
+    options:
+    - Inches
+    - Pounds
+    - Cups
+    - Gallons
+    correctAnswerIndex: 1
+  - questionText: How many minutes are in an hour?
+    options:
+    - 30
+    - 60
+    - 120
+    - 100
+    correctAnswerIndex: 1
+  - questionText: What time is it on the clock? (Clock shows 3:00)
+    options:
+    - 3:00
+    - 6:00
+    - 12:00
+    - 9:00
+    correctAnswerIndex: 0
+  - questionText: If it is 2:30 now, what time will it be in 1 hour and 30 minutes?
+    options:
+    - 3:00
+    - 4:00
+    - 4:30
+    - 5:00
+    correctAnswerIndex: 0
+  - questionText: What time is it on the clock? (Clock shows 7:15)
+    options:
+    - 7:15
+    - 8:15
+    - 7:30
+    - 7:45
+    correctAnswerIndex: 0
+  - questionText: Sarah has 14 apples. She buys 8 more. How many apples does she
+      have now?
+    options:
+    - 20
+    - 22
+    - 21
+    - 23
+    correctAnswerIndex: 1
+  - questionText: Tom has 24 marbles. He gives 9 marbles to his friend. How many
+      marbles does he have left?
+    options:
+    - 14
+    - 16
+    - 18
+    - 15
+    correctAnswerIndex: 0
+  - questionText: Emily has 30 stickers. She gives 12 stickers to her friend. How
+      many stickers does she have now?
+    options:
+    - 18
+    - 17
+    - 19
+    - 16
+    correctAnswerIndex: 3
+  - questionText: Which shape has 4 equal sides?
+    options:
+    - Circle
+    - Triangle
+    - Square
+    - Rectangle
+    correctAnswerIndex: 2
+  - questionText: How many sides does a triangle have?
+    options:
+    - 3
+    - 4
+    - 5
+    - 6
+    correctAnswerIndex: 0
+  - questionText: Which of the following is a rectangle?
+    options:
+    - A shape with 4 sides, all equal
+    - A shape with 2 long sides and 2 short sides
+    - A shape with 3 sides
+    - A shape with no sides
+    correctAnswerIndex: 1
+  - questionText: Which of these shapes has no corners?
+    options:
+    - Square
+    - Circle
+    - Rectangle
+    - Triangle
+    correctAnswerIndex: 1
+  - questionText: 'Which number is greater: 56 or 65?'
+    options:
+    - 56
+    - 65
+    - Both are equal
+    - Cannot compare
+    correctAnswerIndex: 1
+  - questionText: Which number is less than 100 but greater than 50?
+    options:
+    - 45
+    - 65
+    - 110
+    - 25
+    correctAnswerIndex: 1
+  - questionText: Which number is smaller than 30 but larger than 20?
+    options:
+    - 31
+    - 28
+    - 15
+    - 22
+    correctAnswerIndex: 1
+  - questionText: What fraction of the shape is shaded if 3 out of 4 parts are shaded?
+    options:
+    - 1/4
+    - 1/2
+    - 3/4
+    - 4/4
+    correctAnswerIndex: 2
+  - questionText: Which of the following is 1/2 of a whole?
+    options:
+    - One part of two equal pieces
+    - One part of four equal pieces
+    - Two parts of six equal pieces
+    - Three parts of five equal pieces
+    correctAnswerIndex: 0
+  - questionText: If a pizza is cut into 4 equal slices and you eat 2 of them, what
+      fraction of the pizza did you eat?
+    options:
+    - 1/4
+    - 2/4
+    - 1/2
+    - 3/4
+    correctAnswerIndex: 2
+  - questionText: Choose the correct answer to compare 605 and 598.
+    options:
+    - 605 = 598
+    - 605 > 598
+    - 605 < 598
+    - 604 < 598
+    correctAnswerIndex: 1
+  - questionText: Select the word form of 468.
+    options:
+    - four six eight
+    - forty-six eight
+    - four hundred six eight
+    - four hundred sixty-eight
+    correctAnswerIndex: 3
+  - questionText: Select the standard form of three hundred six.
+    options:
+    - 306
+    - 36
+    - 3006
+    - 360
+    correctAnswerIndex: 0
+  - questionText: Find the sum of 64 + 28.
+    options:
+    - 82
+    - 93
+    - 88
+    - 92
+    correctAnswerIndex: 2
+  - questionText: Find the sum of 342 + 446.
+    options:
+    - 778
+    - 788
+    - 888
+    - 798
+    correctAnswerIndex: 2
+  - questionText: What is 10 less than 80?
+    options:
+    - 70
+    - 81
+    - 90
+    - 180
+    correctAnswerIndex: 0
+  - questionText: What is 100 more than 700?
+    options:
+    - 600
+    - 710
+    - 800
+    - 170
+    correctAnswerIndex: 2
+  - questionText: Find the difference for 32 - 18.
+    options:
+    - 16
+    - 14
+    - 24
+    - 60
+    correctAnswerIndex: 0
+  - questionText: What is 900 - 10?
+    options:
+    - 800
+    - 890
+    - 910
+    - 901
+    correctAnswerIndex: 0
+  - questionText: How many sides does a pentagon have?
+    options:
+    - 4
+    - 890
+    - 910
+    - 901
+    correctAnswerIndex: 0
   _correctAnswer: {fileID: 8300000, guid: f79179109a6159048acef8f7102e8875, type: 3}
   _wrongAnswer: {fileID: 8300000, guid: 76eea4e769b5f42499990a3fdd7a41be, type: 3}
   _arenaUnlock: {fileID: 8300000, guid: 597ab907968c67e449dcff203880ba1d, type: 3}
@@ -1480,6 +1766,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 219164324f84e8847be3d88af7373b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  questions: []
   _correctAnswer: {fileID: 0}
   _wrongAnswer: {fileID: 0}
   _arenaUnlock: {fileID: 0}

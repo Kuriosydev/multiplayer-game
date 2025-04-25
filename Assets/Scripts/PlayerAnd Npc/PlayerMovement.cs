@@ -15,14 +15,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] GameObject _leftHand, _rightHand, _dashEffect, _knife1, _knife2, _spawnLocation, _devilFruit1, _devilFruit2;
     public Image _healthbar, _starColor;
     [SerializeField] TMP_Text _playerName, _playerRank;
-    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound, _gainExp, _death;
+    [SerializeField] AudioClip _punchSound, _walkSound, _jumpSound, _doubleJumpSound, _runSound, _swordSound, _dashSound, _swimSound, _gainExp, _death, _devilBoll;
     FixedJoystick _joyStick;
     [SerializeField] CinemachineOrbitalFollow _followCamera;
     public AudioSource _audioSource;
     Animator _animator;
     [SerializeField] LayerMask _ground;
     Rigidbody _rb;
-    string _numberOneRank = "FFC000", _numberTwoRank = "D8D9CD", _normalRankColor = "A0480C";
+    string _numberOneRank = "#FFC000", _numberTwoRank = "#D8D9CD", _normalRankColor = "#A0480C";
     public int _maxHealth = 100, _maxEnergy = 100, _runForce = 6000,
         _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
         _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     float _defenceAdd;
     Vector3 _inputDir;
     RaycastHit _hit;
-    int _hitCounter = 0, _jumpCount = 0;
+    int _hitCounter = 0, _jumpCount = 0, _colorNumber;
     public int _state = 0, _devilFruit = 0, _money, _score;
     bool _canJump = true, _run = true, _attack = false, _combatMode = false, _canHit = true, _soundPlaying = false, _canDash = true;
     [SerializeField] GameObject _deathEffect, _particle;
@@ -64,33 +64,41 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _joyStick = FindFirstObjectByType<FixedJoystick>();
         if (photonView.IsMine)
         {
+            _colorNumber = PlayerPrefs.GetInt("color");
+            photonView.RPC("ColorChanger", RpcTarget.AllBuffered, _colorNumber);
             _followCamera.gameObject.SetActive(true);
             _healthbar.gameObject.SetActive(false);
             GetComponent<TriggerEvents>().enabled = true;
-            foreach (GameObject _part in _parts)
-            {
-                if (PlayerPrefs.GetInt("color") == 1)
-                {
-                    _part.GetComponent<Renderer>().material.color = Color.blue;
-                }
-                else if (PlayerPrefs.GetInt("color") == 2)
-                {
-                    _part.GetComponent<Renderer>().material.color = Color.red;
-                }
-                else if (PlayerPrefs.GetInt("color") == 3)
-                {
-                    _part.GetComponent<Renderer>().material.color = Color.green;
-                }
-                else if (PlayerPrefs.GetInt("color") == 4)
-                {
-                    _part.GetComponent<Renderer>().material.color = Color.magenta;
-                }
-            }
         }
         else
         {
             GetComponent<TriggerEvents>().enabled = false;
         }
+        foreach (GameObject _part in _parts)
+        {
+            if (_colorNumber == 1)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.red;
+            }
+            else if (_colorNumber == 2)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.blue;
+            }
+            else if (_colorNumber == 3)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.magenta;
+            }
+            else if (_colorNumber == 4)
+            {
+                _part.GetComponent<Renderer>().material.color = Color.green;
+            }
+        }
+    }
+
+    [PunRPC]
+    void ColorChanger(int colorN)
+    {
+        _colorNumber = colorN;
     }
 
     public void ScoreIncrease(int score)
@@ -470,7 +478,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             _attack = true;
             _soundPlaying = true;
             _audioSource.Stop();
-            if (_state == 1)
+            if (_state == 1 || _devilFruit == 3)
             {
                 _audioSource.PlayOneShot(_punchSound);
             }
@@ -478,9 +486,10 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             {
                 _audioSource.PlayOneShot(_swordSound);
             }
-            if (_state == 3)
+            else if (_state == 3)
             {
                 FruitPower(_devilFruit);
+                _audioSource.PlayOneShot(_devilBoll);
             }
         }
     }
