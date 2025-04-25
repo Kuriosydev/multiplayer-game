@@ -188,6 +188,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void Tutorial()
     {
+        PlayerPrefs.SetInt("exit",1);
         SceneManager.LoadScene(2);
     }
 

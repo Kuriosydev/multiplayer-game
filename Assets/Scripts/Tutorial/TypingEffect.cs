@@ -5,7 +5,7 @@ using TMPro;
 public class TypingEffect : MonoBehaviour
 {
     public TMP_Text textMeshPro; // Reference to the TextMeshPro component
-    public float typingSpeed = 0.1f; // Speed of typing in seconds
+    public float typingSpeed = 0.5f; // Speed of typing in seconds
 
     private string fullText; // The complete text to be typed
 

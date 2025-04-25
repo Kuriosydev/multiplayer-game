@@ -2054,7 +2054,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textMeshPro: {fileID: 1242723689}
-  typingSpeed: 0.2
+  typingSpeed: 0.05
   _welcomePanel: {fileID: 1806569424}
   _player: {fileID: 8655305068574540973}
 --- !u!1 &1313030607

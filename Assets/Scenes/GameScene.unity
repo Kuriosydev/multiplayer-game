@@ -3275,6 +3275,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Desert island
       objectReference: {fileID: 0}
+    - target: {fileID: 5724128949961073304, guid: 3f452dcc0ac0eab4bb2fea1835d3f0aa, type: 3}
+      propertyPath: m_Volume
+      value: 0.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
