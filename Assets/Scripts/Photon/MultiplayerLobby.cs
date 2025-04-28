@@ -10,7 +10,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
     [SerializeField] GameObject _roomJoiningPanel, _ConnectionPanel, _nameItemprefab, _customJoin, _directJoin, _playerSelection;//, _roomItemprefab;
     [SerializeField]
     GameObject[] _parts;
-    [SerializeField] TMP_InputField _playerName, _randomPlayerName, _roomName;
+    [SerializeField] TMP_InputField _playerName, _randomPlayerName, _roomNameCreate, _roomNameJoin;
     [SerializeField] TMP_Text _roomNameAndCreater, _roomServerMessages;
     [SerializeField] Transform _playerNameSpawnLocation;//, _roomNameSpawnLocation;
     public bool _join = true, _create = true, _connected = false, _randomJoinCreate = false;
@@ -35,8 +35,10 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         PhotonNetwork.Disconnect();
         _playerName.onSelect.AddListener(NameSelect);
         _playerName.onDeselect.AddListener(NameDeselect);
-        _roomName.onSelect.AddListener(RoomSelect);
-        _roomName.onDeselect.AddListener(RoomDeselect);
+        _roomNameJoin.onSelect.AddListener(RoomSelectJoinCode);
+        _roomNameJoin.onDeselect.AddListener(RoomDeselectJoinCode);
+        _roomNameCreate.onSelect.AddListener(RoomSelectCreateCode);
+        _roomNameCreate.onDeselect.AddListener(RoomDeselectCreateCode);
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.EnableCloseConnection = true;
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -60,19 +62,35 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
-    void RoomSelect(string i)
+    void RoomSelectJoinCode(string i)
     {
         if (i.Length < 1)
         {
-            _roomName.text = " ";
+            _roomNameJoin.text = " ";
         }
     }
 
-    void RoomDeselect(string i)
+    void RoomDeselectJoinCode(string i)
     {
         if (i == " ")
         {
-            _roomName.text = "";
+            _roomNameJoin.text = "";
+        }
+    }
+
+    void RoomSelectCreateCode(string i)
+    {
+        if (i.Length < 1)
+        {
+            _roomNameCreate.text = " ";
+        }
+    }
+
+    void RoomDeselectCreateCode(string i)
+    {
+        if (i == " ")
+        {
+            _roomNameCreate.text = "";
         }
     }
 
@@ -116,12 +134,12 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void JoinRoom()
     {
-        if (_roomName.text.Length > 2)
+        if (_roomNameJoin.text.Length > 2)
         {
             if (_join)
             {
                 _join = false;
-                PhotonNetwork.JoinRoom(_roomName.text);
+                PhotonNetwork.JoinRoom(_roomNameJoin.text);
                 Invoke("CanJoinReset", 0.5f);
             }
         }
@@ -166,11 +184,11 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void CreateRoom()
     {
-        if (_roomName.text.Length > 2)
+        if (_roomNameCreate.text.Length > 2)
         {
             if (_create)
             {
-                if (!PhotonNetwork.CreateRoom(_roomName.text, new RoomOptions() { IsVisible = false, MaxPlayers = 10 }))
+                if (!PhotonNetwork.CreateRoom(_roomNameCreate.text, new RoomOptions() { IsVisible = false, MaxPlayers = 10 }))
                 {
                     _create = true;
                     Invoke("JoinReset", 0.5f);

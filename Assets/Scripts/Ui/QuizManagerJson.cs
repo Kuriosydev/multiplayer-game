@@ -46,7 +46,7 @@ public class QuizManagerJson : MonoBehaviour
     Color newColor;
     GameObject _particle;
     public
-    GameObject _quizPanel, _totalQuestion, _wallDestroy;
+    GameObject _quizPanel, _totalQuestion, _wallDestroy, _chestObj;
     void Start()
     {
         _audiosource = GetComponent<AudioSource>();
@@ -257,6 +257,12 @@ public class QuizManagerJson : MonoBehaviour
                 if (_chest)
                 {
                     i.gameObject.GetComponent<PlayerMovement>()._money += _score * 200;
+                    _chestObj.GetComponent<Animator>().SetBool("Open", true);
+                    //Instantiate(_coins, _chestObj.transform.position, Quaternion.identity);
+                    //Instantiate(_coins, _chestObj.transform.position, Quaternion.identity);
+                    //Instantiate(_coins, _chestObj.transform.position, Quaternion.identity);
+                    //Instantiate(_coins, _chestObj.transform.position, Quaternion.identity);
+                    i.ChestClose(_chestObj);
                 }
                 try
                 {

@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class TriggerEvents : MonoBehaviour
@@ -43,6 +44,8 @@ public class TriggerEvents : MonoBehaviour
             {
                 _quizPanelHandler = Instantiate(_quizPanel);
                 _quizPanelHandler.GetComponent<QuizManagerJson>()._chest = true;
+                _quizPanelHandler.GetComponent<QuizManagerJson>()._chestObj = other.gameObject;
+                other.GetComponent<Animator>().SetBool("Open", false);
             }
             else if (other.CompareTag("Wall"))
             {
@@ -66,5 +69,11 @@ public class TriggerEvents : MonoBehaviour
                 _quizPanelHandler.GetComponent<QuestPanel>()._questNumber = int.Parse(other.gameObject.name);
             }
         }
+    }
+
+    public async void ChestClose(GameObject other)
+    {
+        await Task.Delay(2000);
+        other.GetComponent<Animator>().SetBool("Open", false);
     }
 }

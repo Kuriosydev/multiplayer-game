@@ -1201,7 +1201,7 @@ MonoBehaviour:
   _death: {fileID: 8300000, guid: 05c3db4afc32899419158b3c25f86038, type: 3}
   _healthbar: {fileID: 8466445702499335034}
   _stoppingDistance: 1.5
-  _deathEffect: {fileID: 4924508274929071776, guid: 0edef91621bb6b34384ccc9dbb98729c, type: 3}
+  _deathEffect: {fileID: 2944396702758532163, guid: e190bf97c041e58448af6b043116cba0, type: 3}
   _particle: {fileID: 0}
 --- !u!95 &3382449254643363860
 Animator:

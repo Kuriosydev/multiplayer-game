@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     Rigidbody _rb;
     string _numberOneRank = "#FFC000", _numberTwoRank = "#D8D9CD", _normalRankColor = "#A0480C";
     public int _maxHealth = 100, _maxEnergy = 100, _runForce = 6000,
-        _jumpForce = 200, _dashForce = 500, _verticalUp = 45, _verticalDown = 10,
+        _jumpForce = 200, _dashForce = 500, _verticalUp = 35, _verticalDown = 10,
         _sensitivity = 10, _damage = 10, _healthRegain = 5, _healthAdd = 25, _attackAdd = 10,
         _energyRegain = 5, _energyDeduction = 15, _exp = 100, _level = 1, _expRequired, _rank = 1;
     public float _currentHealth, _defence, _currentEnergy, _timer;
@@ -569,11 +569,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
                         {
                             _followCamera.VerticalAxis.Value -= touch.deltaPosition.y * _sensitivity * Time.deltaTime;
                         }
-                        else if (_followCamera.VerticalAxis.Value >= _verticalDown && Mathf.Clamp(Mathf.Atan(touch.deltaPosition.y), -10f, 45f) > 0)
+                        else if (_followCamera.VerticalAxis.Value >= _verticalDown && Mathf.Clamp(Mathf.Atan(touch.deltaPosition.y), -10f, 35f) > 0)
                         {
                             _followCamera.VerticalAxis.Value -= touch.deltaPosition.y * _sensitivity * Time.deltaTime;
                         }
-                        else if (_followCamera.VerticalAxis.Value <= _verticalUp && Mathf.Clamp(Mathf.Atan(touch.deltaPosition.y), -10f, 45f) < 0f)
+                        else if (_followCamera.VerticalAxis.Value <= _verticalUp && Mathf.Clamp(Mathf.Atan(touch.deltaPosition.y), -10f, 35f) < 0f)
                         {
                             _followCamera.VerticalAxis.Value -= touch.deltaPosition.y * _sensitivity * Time.deltaTime;
                         }

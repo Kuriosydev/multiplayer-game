@@ -3053,7 +3053,7 @@ MonoBehaviour:
   _runForce: 6000
   _jumpForce: 1500
   _dashForce: 1600
-  _verticalUp: 45
+  _verticalUp: 30
   _verticalDown: 10
   _sensitivity: 10
   _damage: 10
@@ -3074,7 +3074,7 @@ MonoBehaviour:
   _devilFruit: 0
   _money: 0
   _score: 0
-  _deathEffect: {fileID: 4924508274929071776, guid: 0edef91621bb6b34384ccc9dbb98729c, type: 3}
+  _deathEffect: {fileID: 2944396702758532163, guid: e190bf97c041e58448af6b043116cba0, type: 3}
   _particle: {fileID: 0}
 --- !u!95 &6303631145426199537
 Animator:
