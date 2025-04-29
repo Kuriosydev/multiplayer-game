@@ -23,6 +23,7 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        //reference of components
         transform.position = _startPos;
         photonView.RPC("UpdateStartPos", RpcTarget.AllBuffered, _startPos);
         _currentHealth = _maxHealth;
@@ -37,11 +38,13 @@ public class Enemy : MonoBehaviourPunCallbacks
     [PunRPC]
     void UpdateStartPos(Vector3 _startPosition)
     {
+        //sync the start pos
         _startPos = _startPosition;
     }
 
     void Update()
     {
+        //hp and other things update
         if(_startPos == Vector3.zero)
         {
             _startPos = transform.position;
@@ -147,6 +150,7 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void AfterDeath()
     {
+        //after death
         UpdateHealth(_maxHealth);
         //FindAnyObjectByType<UiManager>()._localPlayer.GetComponent<PlayerMovement>().ExpIncrease(_expIncrement);
         if (_target != null)
@@ -183,12 +187,14 @@ public class Enemy : MonoBehaviourPunCallbacks
     [PunRPC]
     void ObjectTurnOff(int viewId)
     {
+        //object turn off
         PhotonView _pv = PhotonView.Find(viewId);
         _pv.gameObject.SetActive(false);
     }
 
     private void FixedUpdate()
     {
+        //_enemy face target
         if (_target != null)
         {
             faceTarget(_target.position);
@@ -201,6 +207,7 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void Attack()
     {
+        //when enemy attack start
         if (_canHit)
         {
             _target.gameObject.GetComponent<PlayerMovement>().TakeDamage(_attackDamage);
@@ -213,6 +220,7 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void AttackDone()
     {
+        //when enemy attack finish
         _hitCounter += 1;
         if (_hitCounter >= 4)
         {
@@ -224,6 +232,7 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void TakeDamage(int damage, GameObject _theplayer)
     {
+        // when enemy take damage
         if (_currentHealth > 0)
         {
             //_agent.velocity = Vector3.zero;
@@ -241,17 +250,20 @@ public class Enemy : MonoBehaviourPunCallbacks
 
     public void GotHitReset()
     {
+        //after gothit reset
         _animator.SetBool("GotHit", false);
     }
 
     [PunRPC]
     void UpdateHealth(float newHealth)
     {
+        //health update
         _currentHealth = newHealth;
     }
 
     void faceTarget(Vector3 _lookAt)
     {
+        //faces target
         Vector3 dir = (_lookAt - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(dir.x, transform.position.y, dir.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, 5f * Time.deltaTime);

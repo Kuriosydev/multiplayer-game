@@ -12,11 +12,13 @@ public class Coins : MonoBehaviour
 
     private void Update()
     {
+        //makes the coin rotate
         transform.Rotate(rotationSpeed * Time.deltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        // make the coin give money on collision
         if (collision.collider.gameObject.CompareTag("Player"))
         {
             if (collision.collider.gameObject.GetComponent<PhotonView>().IsMine)

@@ -51,6 +51,7 @@ public class PlayerTutorial : MonoBehaviour
         _joyStick.gameObject.SetActive(true);
     }
 
+    //touch ckick player attack
     void TouchControl()
     {
         if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject())
@@ -80,6 +81,7 @@ public class PlayerTutorial : MonoBehaviour
         }
     }
 
+    //joystickcontrol
     void JoyStickControl()
     {
             _inputDir = _orientation.forward * _joyStick.Vertical + _orientation.right * _joyStick.Horizontal;
@@ -123,7 +125,7 @@ public class PlayerTutorial : MonoBehaviour
             }
     }
 
-    // Coroutine to Active Joystick
+    // jumpcontrol
     IEnumerator JumpControl()
     {
         _canMove = false;
@@ -136,6 +138,7 @@ public class PlayerTutorial : MonoBehaviour
         _jumpBtn.SetActive(true);
     }
 
+    //dash control
     IEnumerator DashControl()
     {
         _jumpBtn.GetComponent<Animator>().enabled = false;
@@ -145,6 +148,7 @@ public class PlayerTutorial : MonoBehaviour
         _dashBtn.SetActive(true);
     }
 
+    //sword control
     IEnumerator SwordControl()
     {
         _dashBtn.GetComponent<Animator>().enabled = false;
@@ -154,6 +158,7 @@ public class PlayerTutorial : MonoBehaviour
         _swordBtn.SetActive(true);
     }
 
+    //ground check
     public void GroundCheck()
     {
         if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
@@ -168,6 +173,7 @@ public class PlayerTutorial : MonoBehaviour
         }
     }
 
+    //jump reset
     public void JumpReset()
     {
         _soundPlaying = false;
@@ -176,6 +182,7 @@ public class PlayerTutorial : MonoBehaviour
         _animator.SetInteger("Jump", 0);
     }
 
+    //normal updates
     void Update()
     {
         
@@ -199,7 +206,7 @@ public class PlayerTutorial : MonoBehaviour
          JoyStickControl();
     }
 
-    //Dash and Jump section
+    //Dash
     public void DashForward()
     {
         _soundPlaying = true;
@@ -211,11 +218,13 @@ public class PlayerTutorial : MonoBehaviour
         StartCoroutine(SwordControl());
     }
 
+    //dash force
     public void DashForce()
     {
         _rb.AddForce(transform.forward * _speed * _dashForce * Time.deltaTime, ForceMode.Impulse);
     }
 
+    //dash reset
     public void DashForwardReset()
     {
         _soundPlaying = false;
@@ -223,6 +232,7 @@ public class PlayerTutorial : MonoBehaviour
         _animator.SetBool("DashForward", false);
     }
 
+    //jump
     public void Jump()
     {
             if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f, _ground))
@@ -253,6 +263,7 @@ public class PlayerTutorial : MonoBehaviour
         StartCoroutine(DashControl());
     }
 
+    //jump force
     public void JumpForce()
     {
         _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
@@ -270,6 +281,7 @@ public class PlayerTutorial : MonoBehaviour
         }
     }
 
+    //sword mode
     public void SwordMode()
     {
             this.transform.localPosition = new Vector3(40,58,29);
@@ -287,12 +299,14 @@ public class PlayerTutorial : MonoBehaviour
             StartCoroutine(SwordAcquired());
     }
 
-
+    //sword acquired
     IEnumerator SwordAcquired()
     {
         yield return new WaitForSeconds(2f);
         _swordPanel.SetActive(false);
     }
+
+    //when quiz panel appear
     public void Quiz()
     {
         _swordBtn.SetActive(false);
@@ -315,11 +329,13 @@ public class PlayerTutorial : MonoBehaviour
         }
     }
 
+    //stike count up
     void StrikeCounterUp(int value)
     {
         _animator.SetInteger("StrikeNumber", value);
     }
 
+    //when player attack
     public void Attack()
     {
             _attack = true;
@@ -328,6 +344,7 @@ public class PlayerTutorial : MonoBehaviour
             _audioSource.PlayOneShot(_swordSound);
     }
 
+    //when attack done
     public void AttackDone()
     {
         _hitCounter += 1;
@@ -340,6 +357,7 @@ public class PlayerTutorial : MonoBehaviour
         _canHit = true;
     }
 
+    //when touch clicked attack happens
     public void TouchCliked()
     {
         if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject())

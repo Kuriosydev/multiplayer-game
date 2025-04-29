@@ -31,12 +31,13 @@ public class QuizManager : MonoBehaviour
 
     void Start()
     {
+        //display question
         DisplayQuestion();
     }
 
     void DisplayQuestion()
     {
-       
+       //display questions
             Question q = questions[currentQuestionIndex];
             questionText.text = q.questionText;
 
@@ -53,6 +54,7 @@ public class QuizManager : MonoBehaviour
 
     void OnAnswerSelected(int index)
     {
+        //check for the correct or wrong answer
         if (index == questions[currentQuestionIndex].correctAnswerIndex)
         {
             //score++;
@@ -71,7 +73,7 @@ public class QuizManager : MonoBehaviour
 
     public void ChangeButtonColor(string hex)
     {
-
+        //color change of button
         if (ColorUtility.TryParseHtmlString(hex, out newColor))
         {
             // Change button background color
@@ -85,6 +87,7 @@ public class QuizManager : MonoBehaviour
 
     IEnumerator ResetQuestion()
     {
+        //reset question
         yield return new WaitForSeconds(2f);
         ChangeButtonColor(hexDefaultColor);
         optionButtons[1].transform.GetComponent<Image>().color = newColor;

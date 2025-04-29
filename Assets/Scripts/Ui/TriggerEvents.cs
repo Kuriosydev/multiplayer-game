@@ -38,6 +38,7 @@ public class TriggerEvents : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        //on the bases of what collides we changes the reward
         if (gameObject.GetComponent<PhotonView>().IsMine)
         {
             if (other.CompareTag("Chest"))
@@ -73,6 +74,7 @@ public class TriggerEvents : MonoBehaviour
 
     public async void ChestClose(GameObject other)
     {
+        //closes the chest
         await Task.Delay(2000);
         other.GetComponent<Animator>().SetBool("Open", false);
     }

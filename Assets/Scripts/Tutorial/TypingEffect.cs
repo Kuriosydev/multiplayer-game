@@ -14,6 +14,7 @@ public class TypingEffect : MonoBehaviour
 
     private void Start()
     {
+        //assign the vales
         fullText = textMeshPro.text; // Store the full text
         textMeshPro.text = string.Empty; // Clear the text
         StartCoroutine(TypeText()); // Start typing animation
@@ -22,6 +23,7 @@ public class TypingEffect : MonoBehaviour
     // Coroutine to simulate typing effect
     IEnumerator TypeText()
     {
+        //types the text in tutortial
         foreach (char letter in fullText)
         {
             textMeshPro.text += letter; // Append each letter to the text

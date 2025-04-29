@@ -13,6 +13,7 @@ public class QuestPanel : MonoBehaviour
 
     void Start()
     {
+        //Reference
         _audioSource = GetComponent<AudioSource>();
         _audioSource.PlayOneShot(_popSound);
         if(_questNumber == 1)
@@ -29,6 +30,7 @@ public class QuestPanel : MonoBehaviour
 
     void Accept()
     {
+        //when you accept the quest
         FindFirstObjectByType<UiManager>()._questAccepted = true;
         FindFirstObjectByType<UiManager>().QuestStart(_questNumber, _quest.text);
         Destroy(gameObject);
@@ -36,6 +38,7 @@ public class QuestPanel : MonoBehaviour
      
     void NeverMind()
     {
+        //when you decline the quest
         FindFirstObjectByType<UiManager>()._questAccepted = false;
         Destroy(gameObject);
     }

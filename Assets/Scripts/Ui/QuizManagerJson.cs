@@ -104,6 +104,7 @@ public class QuizManagerJson : MonoBehaviour
 
     void DisplayQuestion()
     {
+        //dispalyes question
         _isAnswered = false;
         currentQuestionIndex = Random.Range(0, questions.Count - 1);
         //if (currentQuestionIndex < questions.Count)
@@ -138,6 +139,7 @@ public class QuizManagerJson : MonoBehaviour
 
     void OnAnswerSelected(int index)
     {
+        //check if answer is selected
         if (!_isAnswered)
         {
             if (index == questions[currentQuestionIndex].correctAnswerIndex)
@@ -175,6 +177,7 @@ public class QuizManagerJson : MonoBehaviour
 
     IEnumerator NextQuestion()
     {
+        //moves to next questions
         questions.RemoveAt(currentQuestionIndex);
         yield return new WaitForSeconds(1.2f);
         _questionsCount++;
@@ -183,7 +186,7 @@ public class QuizManagerJson : MonoBehaviour
 
     public void ChangeButtonColor(string hex)
     {
-        
+        //changes the color
         if (ColorUtility.TryParseHtmlString(hex, out newColor))
         {
             // Change button background color
@@ -198,6 +201,7 @@ public class QuizManagerJson : MonoBehaviour
 
     void WallsDestroy()
     {
+        // wall question answer destroy wall
         if (_wall != null)
         {
             Instantiate(_coins, _wall.transform.position, Quaternion.identity);
@@ -215,6 +219,7 @@ public class QuizManagerJson : MonoBehaviour
 
     void UniqueSound()
     {
+        //unique souns as per question the wall,chest or dealers
         if (_wall != null && _score == 1)
         {
             _audiosource.Stop();
@@ -238,12 +243,14 @@ public class QuizManagerJson : MonoBehaviour
 
     public void Buy()
     {
+        // when you buy devil fruit
         _bought = true;
         Close();
     }
 
     public void Close()
     {
+        // destroys the question panel
         foreach (TriggerEvents i in FindObjectsByType<TriggerEvents>(FindObjectsSortMode.None))
         {
             if (i.isActiveAndEnabled)

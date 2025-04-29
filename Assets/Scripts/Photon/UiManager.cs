@@ -84,6 +84,7 @@ public class UiManager : MonoBehaviourPunCallbacks
         }
         if (_localPlayer != null)
         {
+            //make the ui populate with values for local player
             _energyBar.fillAmount = _localPlayer._currentEnergy / _localPlayer._maxEnergy;
             _energyText.text = ((int)_localPlayer._currentEnergy).ToString() + "/" + _localPlayer._maxEnergy.ToString();
             _healthBar.fillAmount = _localPlayer._currentHealth / _localPlayer._maxHealth;
@@ -101,6 +102,7 @@ public class UiManager : MonoBehaviourPunCallbacks
             {
                 _devilMode.gameObject.SetActive(true);
             }
+            //checks for the state player in
             if(_localPlayer.GetComponent<PlayerMovement>()._state == 1)
             {
                 if (_meleeMode.gameObject.GetComponent<Image>().sprite != _buttonSelected)
@@ -138,13 +140,9 @@ public class UiManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void ParticleDestroy(GameObject particle)
-    {
-        DestroyImmediate(particle,true);
-    }
-
     public void QuestStart(int number, string text)
     {
+        //quest start
         _questIndicator.SetActive(true);
         _kills = 0;
         _quest.text = text;
@@ -163,6 +161,7 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     public void CoinCollected()
     {
+        //when player collectes the coins
         GetComponent<AudioSource>().PlayOneShot(_coins);
         if(_localPlayer != null)
         {
@@ -174,11 +173,13 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     private void OnApplicationQuit()
     {
+        //check for application quit
         PlayerPrefs.SetInt("exit", 0);
     }
 
     public void Exit()
     {
+        //playerexit the game
         PlayerPrefs.SetInt("exit", 1);
         PhotonNetwork.LeaveLobby();
         PhotonNetwork.LeaveRoom();
@@ -188,6 +189,7 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     public void QuestCompleteCheck()
     {
+        //checks for quest completion
         _requireMents.text = _kills.ToString() + "/" + _requiredKills.ToString();
         if (_questType == 1)
         {
@@ -219,6 +221,7 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     public async void MoneyIncrease()
     {
+        // makes the money blink
         await Task.Delay(500);
         _money.gameObject.SetActive(false);
         await Task.Delay(500);
@@ -239,6 +242,7 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     public async void RespawnEnemies(int _enemyModel)
     {
+        //make enemy respawn
         await Task.Delay(40000);
         ObjectTurnOn(_enemyModel);
     }
@@ -246,44 +250,52 @@ public class UiManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void ObjectTurnOn(int viewId)
     {
+        // make objects turn on in multiplayer
         PhotonView _pv = PhotonView.Find(viewId);
         _pv.gameObject.SetActive(true);
     }
 
     void Dash()
     {
+        //Makes the local player dash
         _localPlayer.DashForward();
     }
 
 
     public async void WallReappear(GameObject _wall)
     {
+        //make the question wall reappear
         await Task.Delay(10000);
         _wall.gameObject.SetActive(true);
     }
 
     void MeleeMode()
     {
+        //turns on meleemode
         _localPlayer.MeleeMode();
     }
 
     void SwordMode()
     {
+        //turns on sword mode
         _localPlayer.SwordMode();
     }
 
     void DevilMode()
     {
+        //turns on devil mode
         _localPlayer.DevilFruitMode();
     }
 
     void JumpClicked()
     {
+        //makes player jump
         _localPlayer.Jump();
     }
 
     void MicOnOff()
     {
+        //turn on and off multiplayer mic
         if (_recorder.TransmitEnabled)
         {
             _recorder.TransmitEnabled = false;
@@ -298,6 +310,7 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     void SliderValueChanged(float value)
     {
+        // make others speaker value increase decrease in mutliplayer
         foreach (GameObject speaker in GameObject.FindGameObjectsWithTag("Speaker"))
         {
             speaker.GetComponent<AudioSource>().volume = value;
@@ -306,6 +319,7 @@ public class UiManager : MonoBehaviourPunCallbacks
 
     public override void OnMasterClientSwitched(Player newMasterClient)
     {
+        //switches the master client
         Debug.Log("Master Client switched to: " + newMasterClient.NickName);
     }
 }

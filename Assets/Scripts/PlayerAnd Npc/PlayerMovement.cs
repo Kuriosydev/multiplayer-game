@@ -39,6 +39,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        //assinging references
         _maxHealth = _maxHealth + (_level * _healthAdd);
         _damage = _damage + (_level * _attackAdd);
         _maxEnergy = _maxHealth;
@@ -60,6 +61,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        // changes the color of player and check is is mine
         _playerName.text = photonView.Owner.NickName;
         _joyStick = FindFirstObjectByType<FixedJoystick>();
         if (photonView.IsMine)
@@ -98,17 +100,20 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [PunRPC]
     void ColorChanger(int colorN)
     {
+        //color sync
         _colorNumber = colorN;
     }
 
     public void ScoreIncrease(int score)
     {
+        //scoresync
         _score += score;
         photonView.RPC("UpdateScore", RpcTarget.AllBuffered, _score);
     }
 
     public void LevelUp()
     {
+        //player level up
         if (_exp >= _expRequired)
         {
             _level += 1;
@@ -122,6 +127,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void ExpIncrease(int _value)
     {
+        //player ep increase
         _exp += _value;
         LevelUp();
         _soundPlaying = true;
@@ -229,6 +235,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
     public void AfterDeath()
     {
+        //player after death
         if (photonView.IsMine)
         {
             //DestroyImmediate(_particle, true);
@@ -239,6 +246,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //player pos change after death
     public void ReplaceAfterDeath()
     {
         if (photonView.IsMine)
@@ -250,6 +258,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //players death aniamtion
     void DeathAnimation()
     {
         _animator.SetBool("Death", true);
@@ -410,6 +419,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //when object exit the trigger area
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag("Enemy"))
@@ -420,6 +430,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             }
         }
     }
+
+    //touch clicked attack start when we click
     public void TouchCliked()
     {
         if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject() && _currentHealth > 0)
@@ -449,6 +461,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //fruit powers
     public void FruitPower(int _fruit)
     {
         if (photonView.IsMine)
@@ -466,11 +479,13 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //strke count change
     void StrikeCounterUp(int value)
     {
         _animator.SetInteger("StrikeNumber", value);
     }
 
+    //attack start
     public void Attack()
     {
         if (photonView.IsMine)
@@ -494,6 +509,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //attack done
     public void AttackDone()
     {
         _hitCounter += 1;
@@ -508,6 +524,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _canHit = true;
     }
 
+    //when player take damage
     public void TakeDamage(int damage)
     {
         if (_currentHealth > 0)
@@ -517,6 +534,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //player health sync
     [PunRPC]
     void UpdateHealth(float newHealth)
     {
@@ -526,12 +544,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //player score sync
     [PunRPC]
     void UpdateScore(int score)
     {
         _score = score;
     }
 
+    //player exp update
     void ExpUpdate(int expUpdate)
     {
         if (photonView.IsMine)
@@ -547,13 +567,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _animator.SetInteger("Swim", 0);
     }
 
+    //landswitch
     public void LandSwitch()
     {
         _animator.SetBool("InWater", true);
         _animator.SetInteger("Swim", 1);
     }
 
-    //Camera and Joystick Section;
+    //Camera control
     void TouchControl()
     {
         if (Input.touchCount > 0 && !EventSystem.current.IsPointerOverGameObject())
@@ -583,6 +604,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //joystick control
     void JoyStickControl()
     {
         if (_currentHealth > 0)
@@ -637,7 +659,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     }
 
 
-    //Dash and Jump section
+    //Dash 
     public void DashForward()
     {
         if (photonView.IsMine)
@@ -651,6 +673,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //dash force
     public void DashForce()
     {
         _soundPlaying = true;
@@ -660,6 +683,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _currentEnergy -= _energyDeduction;
     }
 
+    //dash reset
     public void DashForwardReset()
     {
         _soundPlaying = false;
@@ -669,6 +693,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         _animator.SetBool("DashForward", false);
     }
 
+    // jump
     public void Jump()
     {
         if (_currentHealth > 0)
@@ -692,6 +717,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //jump force
     public void JumpForce()
     {
         _rb.AddForce(Vector3.up * _speed * _jumpForce * Time.deltaTime, ForceMode.Impulse);
@@ -711,6 +737,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //ground check
     public void GroundCheck()
     {
         if (Physics.Raycast(_orientation.position, Vector3.down, 0.2f))
@@ -724,6 +751,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         }
     }
 
+    //jump reset
     public void JumpReset()
     {
         _soundPlaying = false;

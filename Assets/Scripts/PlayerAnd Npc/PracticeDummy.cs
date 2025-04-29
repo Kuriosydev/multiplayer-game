@@ -14,6 +14,7 @@ public class PracticeDummy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        //practice dummy take damage
         if (_health > 10)
         {
             _health -= damage;
@@ -28,11 +29,13 @@ public class PracticeDummy : MonoBehaviour
 
     public void GotHitReset()
     {
+        //gothit reset
         _animator.SetBool("GotHit", false);
     }
 
     IEnumerator Restart()
     {
+        //after dummy die
         TutorialFinished.SetActive(true);
         yield return new WaitForSeconds(4f);
         PlayerPrefs.SetInt("Tutorial",1);

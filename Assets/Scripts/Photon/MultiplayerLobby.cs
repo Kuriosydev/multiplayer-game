@@ -18,6 +18,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        //adding references
         if (PlayerPrefs.HasKey("exit"))
         {
             if (PlayerPrefs.GetInt("exit") == 1)
@@ -46,6 +47,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectToRegion("us");
     }
 
+    // inout field normal text gone features
     void NameSelect(string i)
     {
         if (i.Length < 1)
@@ -93,9 +95,11 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
             _roomNameCreate.text = "";
         }
     }
+    //
 
     private void Update()
     {
+        //check for photon network activity andplayer name
         if (PhotonNetwork.IsConnectedAndReady)
         {
             if (!_connected)
@@ -134,6 +138,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void JoinRoom()
     {
+        //player try to join room
         if (_roomNameJoin.text.Length > 2)
         {
             if (_join)
@@ -152,12 +157,14 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void Play()
     {
+        //Play clicked
         _directJoin.SetActive(false);
         _playerSelection.SetActive(true);
     }
     
     public void OncolorClicked(int _colorNumber)
     {
+        //changes the character color
         _customJoin.SetActive(true);
         _playerSelection.SetActive(false);
         PlayerPrefs.SetInt("color", _colorNumber);
@@ -184,6 +191,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void CreateRoom()
     {
+        //create the room
         if (_roomNameCreate.text.Length > 2)
         {
             if (_create)
@@ -206,18 +214,21 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void Tutorial()
     {
+        //turotial load
         PlayerPrefs.SetInt("exit",1);
         SceneManager.LoadScene(2);
     }
 
     public void JoinorCreateRandom()
     {
+        //random join
         PhotonNetwork.JoinRandomOrCreateRoom();
         _randomJoinCreate = true;
     }
 
     public override void OnJoinedRoom()
     {
+        //when player joins the room
         base.OnJoinedRoom();
         _connected = true;
         if (_randomJoinCreate)
@@ -242,6 +253,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
+        //when player fail to join
         base.OnJoinRoomFailed(returnCode, message);
         _roomServerMessages.text = "Room doesn't exist...";
         Invoke("Messagenull", 5f);
@@ -249,6 +261,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
+        //when player joins random
         base.OnJoinRandomFailed(returnCode, message);
         _roomServerMessages.text = "No Room Available...";
         Invoke("Messagenull", 5f);
@@ -256,6 +269,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public override void OnLeftRoom()
     {
+        //when player left
         base.OnLeftRoom();
         GameObject[] nameobj = GameObject.FindGameObjectsWithTag("Name");
         foreach (GameObject game in nameobj)
@@ -266,6 +280,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
+        //when room get created
         base.OnCreatedRoom();
         if (_randomJoinCreate)
         {
@@ -284,11 +299,13 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void MainMenu()
     {
+        //reload
         SceneManager.LoadScene(0);
     }
 
     public void MainMenuRoomLeft()
     {
+        //optional
         _directJoin.SetActive(true);
         _playerSelection.SetActive(false);
         _customJoin.SetActive(false);
@@ -296,6 +313,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void RoomExit()
     {
+        //when player exit room
         foreach (GameObject Name in GameObject.FindGameObjectsWithTag("Name"))
         {
             Destroy(Name);
@@ -313,6 +331,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
         }
     }
 
+    //when start clicked or to start room
     public void StartClicked()
     {
         //if (PhotonNetwork.LocalPlayer.UserId == PhotonNetwork.MasterClient.UserId)
@@ -325,11 +344,13 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     void Messagenull()
     {
+        //server messages
         _roomServerMessages.text = "";
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
+        //when player enter room
         base.OnPlayerEnteredRoom(newPlayer);
         GameObject[] nameobj = GameObject.FindGameObjectsWithTag("Name");
         foreach (GameObject game in nameobj)
@@ -348,6 +369,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
+        // when player exit room
         base.OnPlayerLeftRoom(otherPlayer);
         GameObject[] nameobj = GameObject.FindGameObjectsWithTag("Name");
         foreach (GameObject game in nameobj)
@@ -365,6 +387,7 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     public void CustomJoinOnOff()
     {
+    // turn on jcustom panel
         if (_customJoin.activeSelf)
         {
             _customJoin.SetActive(false);
@@ -395,17 +418,20 @@ public class MultiplayerLobby : MonoBehaviourPunCallbacks
 
     void CanJoinReset()
     {
+        //can join reset
         _join = true;
     }
 
     void JoinReset()
     {
+        //join reset
         _create = true;
     }
 
 
     private void OnApplicationQuit()
     {
+        //on apllication wuit
         PlayerPrefs.SetInt("exit", 0);
     }
 }
